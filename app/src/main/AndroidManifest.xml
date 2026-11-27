@@ -36,6 +36,27 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".CreateQrActivity"
+            android:exported="false"
+            android:label="@string/create_qr_title"
+            android:theme="@style/Theme.QRScreen"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode|smallestScreenSize"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".GalleryActivity"
+            android:exported="false"
+            android:label="@string/my_qr_title"
+            android:theme="@style/Theme.QRScreen"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode|smallestScreenSize" />
+
+        <provider
+            android:name=".QrFileProvider"
+            android:authorities="${applicationId}.files"
+            android:exported="false"
+            android:grantUriPermissions="true" />
+
         <service
             android:name=".ScreenScanService"
             android:exported="false"

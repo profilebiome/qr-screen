@@ -253,28 +253,52 @@ public class MainActivity extends Activity {
     }
 
     private void addTiles() {
-        LinearLayout row = Ui.row(this);
+        int saved = QrStore.list(this).size();
+        int scanned = HistoryStore.list(this).size();
 
-        LinearLayout gallery = tile(R.drawable.ic_gallery, "Desde imagen", "Galería o captura");
+        LinearLayout first = Ui.row(this);
+        LinearLayout create = tile(R.drawable.ic_create, "Crear QR", "Nombre, enlace y vista previa", true);
+        create.setOnClickListener(v -> startActivity(new Intent(this, CreateQrActivity.class)));
+        first.addView(create, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+
+        LinearLayout mine = tile(R.drawable.ic_collection, "Mis códigos",
+                saved == 0 ? "Tu galería" : (saved == 1 ? "1 guardado" : saved + " guardados"), false);
+        mine.setOnClickListener(v -> startActivity(new Intent(this, GalleryActivity.class)));
+        LinearLayout.LayoutParams mineLp = new LinearLayout.LayoutParams(0,
+                LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
+        mineLp.setMarginStart(Ui.px(this, 10));
+        first.addView(mine, mineLp);
+        add(first, 12);
+
+        LinearLayout second = Ui.row(this);
+        LinearLayout gallery = tile(R.drawable.ic_gallery, "Desde imagen", "Galería o captura", false);
         gallery.setOnClickListener(v -> pickImage());
-        row.addView(gallery, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+        second.addView(gallery, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
 
         LinearLayout history = tile(R.drawable.ic_history, "Historial",
-                HistoryStore.list(this).isEmpty() ? "Sin lecturas" : HistoryStore.list(this).size() + " lecturas");
+                scanned == 0 ? "Sin lecturas" : (scanned == 1 ? "1 lectura" : scanned + " lecturas"), false);
         history.setOnClickListener(v -> showHistoryDialog());
         LinearLayout.LayoutParams historyLp = new LinearLayout.LayoutParams(0,
                 LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
         historyLp.setMarginStart(Ui.px(this, 10));
-        row.addView(history, historyLp);
+        second.addView(history, historyLp);
 
-        add(row, 12);
+        LinearLayout.LayoutParams secondLp = Ui.matchWrap();
+        secondLp.topMargin = Ui.px(this, 10);
+        column.addView(second, secondLp);
     }
 
-    private LinearLayout tile(int iconRes, String title, String hint) {
+    private LinearLayout tile(int iconRes, String title, String hint, boolean accent) {
         LinearLayout tile = Ui.column(this);
         tile.setPadding(Ui.px(this, 14), Ui.px(this, 14), Ui.px(this, 14), Ui.px(this, 14));
-        tile.setBackground(Ui.ripple(Ui.round(0xFF101827, Ui.dp(this, 18), 0xFF1E2A3D,
-                Math.max(1, Ui.px(this, 1))), 0x33FFFFFF));
+        if (accent) {
+            GradientDrawable bg = Ui.gradient(0xFF14342A, 0xFF0E2119, Ui.dp(this, 18));
+            bg.setStroke(Math.max(1, Ui.px(this, 1)), 0xFF246B50);
+            tile.setBackground(Ui.ripple(bg, 0x33FFFFFF));
+        } else {
+            tile.setBackground(Ui.ripple(Ui.round(0xFF101827, Ui.dp(this, 18), 0xFF1E2A3D,
+                    Math.max(1, Ui.px(this, 1))), 0x33FFFFFF));
+        }
         tile.setClickable(true);
         tile.setFocusable(true);
 
@@ -472,7 +496,7 @@ public class MainActivity extends Activity {
     }
 
     private void addFooter() {
-        TextView footer = Ui.text(this, "v1.0.1 · Sin cámara · Sin internet · Todo se queda en tu teléfono", 10.5f, 0xFF66758B);
+        TextView footer = Ui.text(this, "v1.1.0 · Sin cámara · Sin internet · Todo se queda en tu teléfono", 10.5f, 0xFF66758B);
         footer.setGravity(Gravity.CENTER);
         LinearLayout.LayoutParams lp = Ui.matchWrap();
         lp.topMargin = Ui.px(this, 26);

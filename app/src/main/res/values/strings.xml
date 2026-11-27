@@ -6,4 +6,6 @@
     <string name="notif_title">QR Screen escaneando</string>
     <string name="notif_text">Buscando códigos en la pantalla…</string>
     <string name="notif_stop">Detener</string>
+    <string name="create_qr_title">Crear QR</string>
+    <string name="my_qr_title">Mis códigos</string>
 </resources>
