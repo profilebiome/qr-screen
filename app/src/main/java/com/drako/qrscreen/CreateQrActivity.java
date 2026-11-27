@@ -287,7 +287,8 @@ public class CreateQrActivity extends Activity {
         }
         saved = true;
         Actions.toast(this, "Guardado en Mis códigos");
-        startActivity(new Intent(this, GalleryActivity.class));
+        startActivity(new Intent(this, GalleryActivity.class)
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP));
         finish();
     }
 
