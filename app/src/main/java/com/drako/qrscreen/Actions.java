@@ -55,12 +55,100 @@ final class Actions {
             return false;
         }
         String t = text.trim();
+        if (t.isEmpty()) {
+            return false;
+        }
         String low = t.toLowerCase(Locale.ROOT);
         return low.startsWith("http://") || low.startsWith("https://") || low.startsWith("www.")
                 || low.startsWith("mailto:") || low.startsWith("tel:") || low.startsWith("sms:")
                 || low.startsWith("geo:") || low.startsWith("market://") || low.startsWith("otpauth://")
                 || low.startsWith("wifi:") || low.startsWith("begin:vcard") || low.startsWith("bitcoin:")
-                || low.startsWith("upi://") || low.startsWith("intent://");
+                || low.startsWith("upi://") || low.startsWith("intent://")
+                // dominios sin esquema: tienda.com, wa.me/521..., 192.168.1.1
+                || looksLikeWeb(t);
+    }
+
+    /** true si el texto es un dominio o IP con pinta de URL, aunque no lleve https://. */
+    static boolean looksLikeWeb(String text) {
+        if (text == null) {
+            return false;
+        }
+        String t = text.trim();
+        if (t.isEmpty()) {
+            return false;
+        }
+        for (int i = 0; i < t.length(); i++) {
+            char c = t.charAt(i);
+            if (c == ' ' || c == '\n' || c == '\t') {
+                return false;
+            }
+        }
+        String host = t;
+        int cut = host.length();
+        int slash = host.indexOf('/');
+        if (slash >= 0) {
+            cut = Math.min(cut, slash);
+        }
+        int query = host.indexOf('?');
+        if (query >= 0) {
+            cut = Math.min(cut, query);
+        }
+        int hash = host.indexOf('#');
+        if (hash >= 0) {
+            cut = Math.min(cut, hash);
+        }
+        host = host.substring(0, cut);
+        int colon = host.indexOf(':');
+        if (colon >= 0) {
+            host = host.substring(0, colon);
+        }
+        if (host.isEmpty()) {
+            return false;
+        }
+        boolean ipv4 = true;
+        int dots = 0;
+        int digits = 0;
+        for (int i = 0; i < host.length(); i++) {
+            char c = host.charAt(i);
+            if (c == '.') {
+                dots++;
+                digits = 0;
+            } else if (c >= '0' && c <= '9') {
+                digits++;
+                if (digits > 3) {
+                    ipv4 = false;
+                }
+            } else {
+                ipv4 = false;
+                break;
+            }
+        }
+        if (ipv4 && dots == 3) {
+            return true;
+        }
+        int lastDot = host.lastIndexOf('.');
+        if (lastDot <= 0 || lastDot == host.length() - 1) {
+            return false;
+        }
+        String tld = host.substring(lastDot + 1);
+        if (tld.length() < 2) {
+            return false;
+        }
+        for (int i = 0; i < tld.length(); i++) {
+            char c = tld.charAt(i);
+            if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'))) {
+                return false;
+            }
+        }
+        for (int i = 0; i < host.length(); i++) {
+            char c = host.charAt(i);
+            boolean ok = (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')
+                    || (c >= '0' && c <= '9') || c == '.' || c == '-';
+            if (!ok) {
+                return false;
+            }
+        }
+        return true;
     }
 
     static boolean open(Context c, String text) {
@@ -71,6 +159,11 @@ final class Actions {
         String low = t.toLowerCase(Locale.ROOT);
         try {
             Intent i;
+            if (!low.startsWith("http://") && !low.startsWith("https://") && looksLikeWeb(t)) {
+                // Un enlace sin esquema se abre igual: se añade https://
+                t = "https://" + t;
+                low = t.toLowerCase(Locale.ROOT);
+            }
             if (low.startsWith("http://") || low.startsWith("https://") || low.startsWith("market://")
                     || low.startsWith("geo:") || low.startsWith("otpauth://") || low.startsWith("upi://")
                     || low.startsWith("bitcoin:") || low.startsWith("intent://")) {

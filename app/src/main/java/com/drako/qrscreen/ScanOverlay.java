@@ -697,23 +697,29 @@ final class ScanOverlay {
         buttonsLp.topMargin = Ui.px(ctx, 14);
         buttons.setLayoutParams(buttonsLp);
 
-        TextView copy = Ui.button(ctx, "Copiar", 13.5f);
-        copy.setOnClickListener(v -> Actions.copy(ctx, text));
-        LinearLayout.LayoutParams copyLp = new LinearLayout.LayoutParams(0,
-                LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
-        buttons.addView(copy, copyLp);
+        // Si el contenido es un enlace (con o sin https://), abrir es la acción principal.
+        boolean canOpen = Actions.openable(text);
 
-        if (Actions.openable(text)) {
-            TextView open = Ui.ghostButton(ctx, "Abrir", 13.5f, Ui.TEXT);
+        if (canOpen) {
+            TextView open = Ui.button(ctx, "Abrir", 13.5f);
             open.setOnClickListener(v -> {
                 Actions.open(ctx, text);
                 dismissResult();
             });
-            LinearLayout.LayoutParams openLp = new LinearLayout.LayoutParams(0,
-                    LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
-            openLp.setMarginStart(Ui.px(ctx, 8));
-            buttons.addView(open, openLp);
+            buttons.addView(open, new LinearLayout.LayoutParams(0,
+                    LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
         }
+
+        TextView copy = canOpen
+                ? Ui.ghostButton(ctx, "Copiar", 13.5f, Ui.TEXT)
+                : Ui.button(ctx, "Copiar", 13.5f);
+        copy.setOnClickListener(v -> Actions.copy(ctx, text));
+        LinearLayout.LayoutParams copyLp = new LinearLayout.LayoutParams(0,
+                LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
+        if (canOpen) {
+            copyLp.setMarginStart(Ui.px(ctx, 8));
+        }
+        buttons.addView(copy, copyLp);
 
         TextView share = Ui.ghostButton(ctx, "Compartir", 13.5f, Ui.TEXT);
         share.setOnClickListener(v -> Actions.share(ctx, text));

@@ -347,18 +347,24 @@ public class GalleryActivity extends Activity {
         LinearLayout row1 = Ui.row(this);
         LinearLayout.LayoutParams row1Lp = Ui.matchWrap();
         row1Lp.topMargin = Ui.px(this, 12);
-        TextView copy = Ui.button(this, "Copiar", 12.5f);
-        copy.setOnClickListener(v -> Actions.copy(this, entry.content));
-        row1.addView(copy, new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
-
-        if (Actions.openable(entry.content)) {
-            TextView open = Ui.ghostButton(this, "Abrir", 12.5f, Ui.TEXT);
+        boolean canOpen = Actions.openable(entry.content);
+        if (canOpen) {
+            TextView open = Ui.button(this, "Abrir", 12.5f);
             open.setOnClickListener(v -> Actions.open(this, entry.content));
-            LinearLayout.LayoutParams openLp = new LinearLayout.LayoutParams(0,
-                    LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
-            openLp.setMarginStart(Ui.px(this, 8));
-            row1.addView(open, openLp);
+            row1.addView(open, new LinearLayout.LayoutParams(0,
+                    LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
         }
+
+        TextView copy = canOpen
+                ? Ui.ghostButton(this, "Copiar", 12.5f, Ui.TEXT)
+                : Ui.button(this, "Copiar", 12.5f);
+        copy.setOnClickListener(v -> Actions.copy(this, entry.content));
+        LinearLayout.LayoutParams copyLp = new LinearLayout.LayoutParams(0,
+                LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
+        if (canOpen) {
+            copyLp.setMarginStart(Ui.px(this, 8));
+        }
+        row1.addView(copy, copyLp);
 
         TextView share = Ui.ghostButton(this, "Compartir", 12.5f, Ui.TEXT);
         share.setOnClickListener(v -> sharePng(entry));
