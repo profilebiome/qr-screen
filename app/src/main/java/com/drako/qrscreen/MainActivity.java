@@ -472,7 +472,7 @@ public class MainActivity extends Activity {
     }
 
     private void addFooter() {
-        TextView footer = Ui.text(this, "v1.0 · Sin cámara · Todo se procesa en tu dispositivo", 10.5f, 0xFF66758B);
+        TextView footer = Ui.text(this, "v1.0.1 · Sin cámara · Sin internet · Todo se queda en tu teléfono", 10.5f, 0xFF66758B);
         footer.setGravity(Gravity.CENTER);
         LinearLayout.LayoutParams lp = Ui.matchWrap();
         lp.topMargin = Ui.px(this, 26);

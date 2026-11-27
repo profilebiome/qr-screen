@@ -18,7 +18,7 @@ captura la pantalla con `MediaProjection` y decodifica los píxeles con ZXing.
 
 ## Instalar
 
-1. Copia `dist/QR-Screen-1.0.apk` al teléfono (cable, Drive, Telegram…).
+1. Copia `dist/QR-Screen-1.0.1.apk` al teléfono (cable, Drive, Telegram…).
 2. Ábrelo y acepta «Instalar apps desconocidas» para el explorador/gestor de archivos.
 3. Al abrir la app:
    - concede **Mostrar sobre otras apps** (visor y tarjeta de resultados),
@@ -27,6 +27,40 @@ captura la pantalla con `MediaProjection` y decodifica los píxeles con ZXing.
 
 > La aceptación de captura se pide cada vez que inicias el escáner: es un requisito de Android.
 > La app nunca pide cámara ni acceso a internet.
+
+### «No se puede verificar la app» / «Play Protect»
+
+Ese aviso **lo pone Android, no la app**, y aparece con cualquier APK instalado fuera de Google
+Play. No hay ningún ajuste dentro del APK que lo quite: la única forma de eliminarlo del todo es
+publicar en Play Store. Para instalar igualmente:
+
+- Toca **Más detalles → Instalar de todas formas** (o «Instalar sin analizar»).
+- Si el teléfono lo bloquea: **Play Store → foto de perfil → Play Protect → ⚙ → desactiva
+  «Analizar apps con Play Protect»** durante la instalación y vuelve a activarlo después.
+- En Xiaomi/POCO/HyperOS, además: **Ajustes → Privacidad → Protección → desactivar «Analizar apps
+  instaladas»**, y activa «Instalar vía USB» en Opciones de desarrollador.
+- Si dice **«App no instalada»** suele ser porque ya hay una versión con otra firma:
+  desinstala la anterior y vuelve a instalar.
+
+### Instalar por USB (sin avisos del gestor de archivos)
+
+Con depuración USB activada, ejecuta `instalar-adb.bat` en Windows (o a mano:
+`adb install -r dist/QR-Screen-1.0.1.apk`). Es la vía más limpia y permite ver el motivo exacto si
+la instalación falla.
+
+### ¿Es maliciosa?
+
+No. Auditoría del APK:
+
+- **Sin permiso de INTERNET**: no puede enviar nada a ningún servidor.
+- **Sin cámara, sin contactos, sin ubicación, sin almacenamiento.**
+- Permisos: servicio en primer plano, proyección de pantalla, notificaciones, dibujar sobre otras
+  apps y vibración. Todos son los que necesita el escáner para funcionar.
+- Una sola dependencia (ZXing core, decodificador libre de Google), sin analítica ni SDK de
+  terceros; un único `classes.dex`, sin librerías nativas.
+- Firma propia (`keystore/qrscreen.jks`), verificada con `apksigner` (v1+v2+v3).
+
+El código fuente completo está en este repositorio para que cualquiera lo revise y recompile.
 
 ## Cómo se usa
 
@@ -53,6 +87,13 @@ Requisitos: JDK 17 y Android SDK con platform 34 y build-tools 34.0.0.
 # local.properties con sdk.dir apuntando al SDK
 ./gradlew :app:assembleRelease
 # APK firmado: app/build/outputs/apk/release/app-release.apk
+```
+
+Comprobar la firma y los permisos:
+
+```bash
+apksigner verify -v --print-certs dist/QR-Screen-1.0.1.apk
+aapt2 dump badging dist/QR-Screen-1.0.1.apk | findstr permission
 ```
 
 Firma: `keystore/qrscreen.jks` (alias `qrscreen`, contraseñas en `app/build.gradle`).
