@@ -163,10 +163,12 @@ final class UpdateChecker {
 
     private static String readAll(InputStream in) throws IOException {
         StringBuilder sb = new StringBuilder();
-        byte[] buffer = new byte[8192];
-        int read;
-        while ((read = in.read(buffer)) != -1) {
-            sb.append(new String(buffer, 0, read, "UTF-8"));
+        try (java.io.Reader reader = new java.io.InputStreamReader(in, "UTF-8")) {
+            char[] buffer = new char[4096];
+            int read;
+            while ((read = reader.read(buffer)) != -1) {
+                sb.append(buffer, 0, read);
+            }
         }
         return sb.toString();
     }
