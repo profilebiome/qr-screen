@@ -72,6 +72,9 @@ final class QrStore {
             return null;
         }
         List<Entry> items = list(c);
+        if (items.size() >= MAX_ITEMS) {
+            return null;
+        }
         long id = System.currentTimeMillis();
         String cleanName = name == null ? "" : name.trim();
         if (cleanName.isEmpty()) {

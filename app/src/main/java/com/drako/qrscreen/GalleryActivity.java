@@ -391,7 +391,12 @@ public class GalleryActivity extends Activity {
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         FrameLayout wrap = new FrameLayout(this);
         wrap.setPadding(Ui.px(this, 14), Ui.px(this, 24), Ui.px(this, 14), Ui.px(this, 26));
-        wrap.addView(card, new FrameLayout.LayoutParams(
+        ScrollView scroller = new ScrollView(this);
+        scroller.setVerticalScrollBarEnabled(false);
+        scroller.setClipToPadding(false);
+        scroller.addView(card, new ScrollView.LayoutParams(
+                ScrollView.LayoutParams.MATCH_PARENT, ScrollView.LayoutParams.WRAP_CONTENT));
+        wrap.addView(scroller, new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT));
         dialog.setContentView(wrap);
         dialog.setOnShowListener(d -> {
@@ -515,6 +520,7 @@ public class GalleryActivity extends Activity {
             values.put(MediaStore.Images.Media.MIME_TYPE, "image/png");
             values.put(MediaStore.Images.Media.RELATIVE_PATH,
                     android.os.Environment.DIRECTORY_PICTURES + "/QR Screen");
+            values.put(MediaStore.Images.Media.IS_PENDING, 1);
             inserted = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
             if (inserted == null) {
                 Actions.toast(this, "No se pudo guardar en la galería");
@@ -526,6 +532,9 @@ public class GalleryActivity extends Activity {
                 }
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
             }
+            ContentValues done = new ContentValues();
+            done.put(MediaStore.Images.Media.IS_PENDING, 0);
+            getContentResolver().update(inserted, done, null, null);
             Actions.toast(this, "Guardado en Pictures/QR Screen");
         } catch (Throwable t) {
             if (inserted != null) {

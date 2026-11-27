@@ -149,7 +149,9 @@ public class CreateQrActivity extends Activity {
         copyButton = Ui.ghostButton(this, "Copiar contenido", 13f, Ui.TEXT);
         copyButton.setOnClickListener(v -> {
             String text = contentInput.getText().toString().trim();
-            if (!text.isEmpty()) {
+            if (text.isEmpty()) {
+                Actions.toast(this, "Escribe el contenido del QR");
+            } else {
                 Actions.copy(this, text);
             }
         });
@@ -282,7 +284,7 @@ public class CreateQrActivity extends Activity {
         String type = QrStore.detectType(content);
         QrStore.Entry entry = QrStore.add(this, name, content, type);
         if (entry == null) {
-            Actions.toast(this, "No se pudo guardar");
+            Actions.toast(this, "Límite de 200 códigos: borra alguno en Mis códigos");
             return;
         }
         saved = true;
