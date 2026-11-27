@@ -135,6 +135,7 @@ public class MainActivity extends Activity {
         addHeader();
         addHero();
         addTiles();
+        addSavedBar();
         if (ScreenScanService.RUNNING) {
             addActiveCard();
         }
@@ -174,11 +175,7 @@ public class MainActivity extends Activity {
         LinearLayout titles = Ui.column(this);
         TextView name = Ui.bold(this, "QR Screen", 19f, Ui.TEXT);
         name.setLetterSpacing(0.01f);
-        TextView tag = Ui.text(this, "Lector de pantalla · sin cámara", 11.5f, Ui.TEXT_DIM);
-        LinearLayout.LayoutParams tagLp = Ui.matchWrap();
-        tagLp.topMargin = Ui.px(this, 2);
         titles.addView(name);
-        titles.addView(tag, tagLp);
         LinearLayout.LayoutParams titlesLp = new LinearLayout.LayoutParams(0,
                 LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
         titlesLp.setMarginStart(Ui.px(this, 12));
@@ -194,15 +191,6 @@ public class MainActivity extends Activity {
         GradientDrawable bg = Ui.gradient(0xFF16273F, 0xFF0D1626, Ui.dp(this, 24));
         bg.setStroke(Math.max(1, Ui.px(this, 1)), 0xFF23395A);
         hero.setBackground(bg);
-
-        TextView chip = Ui.bold(this, "SIN CÁMARA", 9.5f, Ui.ACCENT);
-        chip.setLetterSpacing(0.12f);
-        chip.setGravity(Gravity.CENTER);
-        chip.setPadding(Ui.px(this, 10), Ui.px(this, 5), Ui.px(this, 10), Ui.px(this, 5));
-        chip.setBackground(Ui.round(0x1F34D399, Ui.dp(this, 30)));
-        LinearLayout.LayoutParams chipLp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        hero.addView(chip, chipLp);
 
         TextView title = Ui.bold(this, "Escanea el QR que ya está\nen tu pantalla", 21f, Ui.TEXT);
         title.setLineSpacing(Ui.dp(this, 2), 1f);
@@ -241,14 +229,13 @@ public class MainActivity extends Activity {
         });
         hero.addView(action, actionLp);
 
-        TextView note = Ui.text(this, running
-                        ? "Toca Detener para finalizar la captura."
-                        : "Pide permiso de captura una vez y muestra un visor sobre tus apps.",
-                10.5f, 0xFF8291A6);
-        note.setGravity(Gravity.CENTER);
-        LinearLayout.LayoutParams noteLp = Ui.matchWrap();
-        noteLp.topMargin = Ui.px(this, 9);
-        hero.addView(note, noteLp);
+        if (running) {
+            TextView note = Ui.text(this, "Toca Detener para finalizar la captura.", 10.5f, 0xFF8291A6);
+            note.setGravity(Gravity.CENTER);
+            LinearLayout.LayoutParams noteLp = Ui.matchWrap();
+            noteLp.topMargin = Ui.px(this, 9);
+            hero.addView(note, noteLp);
+        }
 
         add(hero, 16);
     }
@@ -287,6 +274,63 @@ public class MainActivity extends Activity {
         LinearLayout.LayoutParams secondLp = Ui.matchWrap();
         secondLp.topMargin = Ui.px(this, 10);
         column.addView(second, secondLp);
+    }
+
+    /** Tira horizontal con los códigos guardados; un toque abre la galería. */
+    private void addSavedBar() {
+        final java.util.List<QrStore.Entry> saved = QrStore.list(this);
+        if (saved.isEmpty()) {
+            return;
+        }
+        LinearLayout head = Ui.row(this);
+        head.addView(Ui.bold(this, "Mis códigos", 14.5f, Ui.TEXT),
+                new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+        TextView all = Ui.bold(this, "Ver todos", 11.5f, Ui.ACCENT);
+        all.setPadding(Ui.px(this, 10), Ui.px(this, 6), Ui.px(this, 4), Ui.px(this, 6));
+        all.setOnClickListener(v -> startActivity(new Intent(this, GalleryActivity.class)));
+        head.addView(all, new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+        add(head, 18);
+
+        android.widget.HorizontalScrollView hscroll = new android.widget.HorizontalScrollView(this);
+        hscroll.setHorizontalScrollBarEnabled(false);
+        hscroll.setClipToPadding(false);
+        LinearLayout row = Ui.row(this);
+
+        int shown = Math.min(saved.size(), 12);
+        for (int i = 0; i < shown; i++) {
+            final QrStore.Entry entry = saved.get(i);
+            LinearLayout item = Ui.column(this);
+            item.setPadding(0, 0, 0, 0);
+
+            ImageView qr = new ImageView(this);
+            qr.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            qr.setBackground(Ui.round(0xFFF6F2E9, Ui.dp(this, 12)));
+            int pad = Ui.px(this, 6);
+            qr.setPadding(pad, pad, pad, pad);
+            qr.setImageBitmap(QrRenderer.create(entry.content, 200));
+            item.addView(qr, new LinearLayout.LayoutParams(Ui.px(this, 78), Ui.px(this, 78)));
+
+            TextView label = Ui.text(this, entry.name, 9.5f, Ui.TEXT_DIM);
+            label.setMaxLines(1);
+            label.setEllipsize(android.text.TextUtils.TruncateAt.END);
+            LinearLayout.LayoutParams labelLp = new LinearLayout.LayoutParams(
+                    Ui.px(this, 78), LinearLayout.LayoutParams.WRAP_CONTENT);
+            labelLp.topMargin = Ui.px(this, 5);
+            item.addView(label, labelLp);
+
+            item.setOnClickListener(v -> startActivity(new Intent(this, GalleryActivity.class)));
+            LinearLayout.LayoutParams itemLp = new LinearLayout.LayoutParams(
+                    Ui.px(this, 78), LinearLayout.LayoutParams.WRAP_CONTENT);
+            itemLp.setMarginEnd(Ui.px(this, 10));
+            row.addView(item, itemLp);
+        }
+        hscroll.addView(row, new android.widget.HorizontalScrollView.LayoutParams(
+                android.widget.HorizontalScrollView.LayoutParams.WRAP_CONTENT,
+                android.widget.HorizontalScrollView.LayoutParams.WRAP_CONTENT));
+        LinearLayout.LayoutParams hLp = Ui.matchWrap();
+        hLp.topMargin = Ui.px(this, 10);
+        column.addView(hscroll, hLp);
     }
 
     private LinearLayout tile(int iconRes, String title, String hint, boolean accent) {
@@ -497,15 +541,9 @@ public class MainActivity extends Activity {
     }
 
     private void addFooter() {
-        TextView footer = Ui.text(this, "v1.2.0 · Sin cámara · Internet solo para actualizar", 10.5f, 0xFF66758B);
-        footer.setGravity(Gravity.CENTER);
-        LinearLayout.LayoutParams lp = Ui.matchWrap();
-        lp.topMargin = Ui.px(this, 26);
-        column.addView(footer, lp);
-
         TextView check = Ui.bold(this, "Buscar actualizaciones", 11f, Ui.ACCENT);
         check.setGravity(Gravity.CENTER);
-        check.setPadding(0, Ui.px(this, 10), 0, Ui.px(this, 4));
+        check.setPadding(0, Ui.px(this, 26), 0, Ui.px(this, 4));
         check.setOnClickListener(v -> Updater.check(this, true));
         column.addView(check, Ui.matchWrap());
     }

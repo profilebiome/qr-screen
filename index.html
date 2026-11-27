@@ -21,13 +21,14 @@
 /* Hallmark · waive 8 · 1.1.0, 304 KB y cinco permisos · cada cifra sale de la ficha del APK compilado, ninguna es estimacion */
 /* Hallmark · reworded "El QR ya está en tu pantalla" a "El QR está en tu pantalla" · el titular entra en el presupuesto de palabras del gate 58 */
 /* Hallmark · reworded "Devuelve el contenido" a "Devuelve el texto" · la tarjeta devuelve texto y así lo llama el resto de la página */
-/* Hallmark · reworded "dist/QR-Screen-1.0.1.apk" a "dist/QR-Screen-1.2.0.apk" · el APK publicado pasa a la versión con generador de códigos */
+/* Hallmark · reworded "dist/QR-Screen-1.0.1.apk" a "dist/QR-Screen-1.3.0.apk" · el APK publicado pasa a la versión con generador de códigos */
 /* Hallmark · dropped Ficha del APK · el usuario pidió quitar la ficha técnica y el pie de la página */
 /* Hallmark · dropped https://github.com/profilebiome/qr-screen#instalar · el pie se retiró a petición y la guía sigue enlazada desde Instalar */
 /* Hallmark · dropped 2026 · el pie con el año se retiró a petición del usuario */
 /* Hallmark · dropped ficha-titulo · la sección de ficha técnica se retiró a petición del usuario */
 /* Hallmark · dropped #que-hace · el usuario pidió quitar la navegación superior */
 /* Hallmark · dropped https://github.com/profilebiome/qr-screen · el usuario pidió quitar la navegación superior */
+/* Hallmark · reworded "dist/QR-Screen-1.2.0.apk" a "dist/QR-Screen-1.3.0.apk" · versión nueva con barra de galería e información por código */
 
 :root {
   --bg: #060706;
@@ -43,6 +44,7 @@
   --mint: #34d399;
   --mint-deep: #0e9f6e;
   --mint-ink: #04140e;
+  --danger: #f87171;
   --code-paper: #f7f9f7;
   --lift: 5px 5px 0 var(--surface);
   --lift-hover: 7px 7px 0 var(--mint-deep);
@@ -393,6 +395,14 @@ h2 {
 
 /* ------------------------------------------------------------------ states */
 
+.btn:disabled,
+.code-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
 a:focus-visible,
 button:focus-visible {
   outline: 2px solid var(--mint);
@@ -439,6 +449,157 @@ button:focus-visible {
   * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; }
 }
 
+/* ------------------------------------------------------------------ studio (web) */
+
+.studio {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: var(--col-gap);
+  align-items: start;
+}
+
+.studio-form { display: grid; gap: 0.9rem; }
+
+.field { display: grid; gap: 0.35rem; }
+
+.field label {
+  font-size: 0.78rem;
+  color: var(--muted-dim);
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  background: var(--bg-soft);
+  border: 1px solid var(--muted-dim);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 0.95rem;
+  padding: 0.7rem 0.8rem;
+}
+
+.field textarea { min-height: 5rem; resize: vertical; }
+
+.field input:focus-visible,
+.field textarea:focus-visible {
+  outline: 2px solid var(--mint);
+  outline-offset: 2px;
+  border-color: var(--mint);
+}
+
+.studio-form .btn { justify-self: start; }
+
+.studio-hint {
+  margin: 0;
+  color: var(--muted-dim);
+  font-size: 0.78rem;
+}
+
+.studio-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.code-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: var(--surface-soft);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--text);
+}
+
+.code-card img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  background: var(--code-paper);
+  border-radius: 6px;
+  image-rendering: pixelated;
+}
+
+.code-name {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.code-meta {
+  margin: 0;
+  color: var(--muted-dim);
+  font-family: var(--mono);
+  font-size: 0.68rem;
+}
+
+.code-info {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+  overflow-wrap: anywhere;
+}
+
+.code-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: auto;
+}
+
+.code-actions button {
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  padding: 0.3rem 0.45rem;
+  cursor: pointer;
+}
+
+.code-actions button:hover { color: var(--text); border-color: var(--mint); }
+.code-actions button.danger:hover { color: var(--danger); border-color: var(--danger); }
+
+.empty-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+/* ------------------------------------------------------------------ closing band */
+
+.closing {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem 2rem;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface);
+  border-radius: 14px;
+  padding: clamp(1.6rem, 4vw, 2.6rem);
+  margin-block: clamp(2.5rem, 6vw, 4rem);
+}
+
+.closing h2 { font-size: clamp(1.9rem, 3.4vw, 2.7rem); }
+
+.closing .actions { margin-top: 0; }
+
+@media (max-width: 1000px) {
+  .studio { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 560px) {
+  .studio-grid { grid-template-columns: minmax(0, 1fr); }
+  .studio-form .btn { width: 100%; }
+  .closing { flex-direction: column; align-items: flex-start; }
+  .closing .actions { width: 100%; }
+  .closing .actions .btn { width: 100%; }
+}
+
 </style>
 </head>
 <body>
@@ -446,7 +607,7 @@ button:focus-visible {
 
 <header class="site-head">
   <div class="wrap head-inner">
-    <a class="wordmark" href="./">QR Screen <span class="edition">1.2.0</span></a>
+    <a class="wordmark" href="./">QR Screen <span class="edition">1.3.0</span></a>
   </div>
 </header>
 
@@ -474,7 +635,7 @@ button:focus-visible {
 
     <div class="hero-foot">
       <div class="actions">
-        <a class="btn" href="dist/QR-Screen-1.2.0.apk" download>
+        <a class="btn" href="dist/QR-Screen-1.3.0.apk" download>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M12 4v11"/>
             <path d="m7.5 10.5 4.5 4.5 4.5-4.5"/>
@@ -482,6 +643,7 @@ button:focus-visible {
           </svg>
           Descargar APK
         </a>
+        <a class="btn btn-quiet" href="https://github.com/profilebiome/qr-screen/raw/main/pc/QR-Screen-Updater.exe">Descargar para PC</a>
         <a class="btn btn-quiet" href="#instalar">Ver cómo instalar</a>
       </div>
       <ul class="meta">
@@ -529,11 +691,42 @@ button:focus-visible {
     </div>
   </section>
 
+  <section class="section" id="codigos" aria-labelledby="codigos-titulo">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="codigos-titulo">Tus códigos</h2>
+        <p>Crea un QR con nombre y enlace, y guárdalo en este navegador.</p>
+      </div>
+      <div class="studio">
+        <form class="studio-form" id="qr-form" novalidate>
+          <div class="field">
+            <label for="qr-name">Nombre</label>
+            <input id="qr-name" name="name" type="text" maxlength="60" placeholder="Wi-Fi de casa" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="qr-content">Enlace o contenido</label>
+            <input id="qr-content" name="content" type="text" placeholder="https://…" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="qr-info">Información</label>
+            <textarea id="qr-info" name="info" maxlength="240" placeholder="Para qué es, dónde va…"></textarea>
+          </div>
+          <button class="btn" type="submit">Guardar código</button>
+          <p class="studio-hint">Se guardan solo en este navegador.</p>
+        </form>
+        <div>
+          <div class="studio-grid" id="qr-grid" hidden></div>
+          <p class="empty-note" id="qr-empty">Todavía no hay códigos guardados aquí.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="section" id="instalar" aria-labelledby="instalar-titulo">
     <div class="wrap install">
       <div>
         <h2 id="instalar-titulo">Instalar</h2>
-                <a class="btn install-cta" href="dist/QR-Screen-1.2.0.apk" download>
+                <a class="btn install-cta" href="dist/QR-Screen-1.3.0.apk" download>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M12 4v11"/>
             <path d="m7.5 10.5 4.5 4.5 4.5-4.5"/>
@@ -554,7 +747,218 @@ button:focus-visible {
     </div>
   </section>
 
+
+  <section class="wrap closing" aria-label="Descargar QR Screen">
+    <h2>Llévalo en el bolsillo</h2>
+    <div class="actions">
+      <a class="btn" href="dist/QR-Screen-1.3.0.apk" download>Descargar APK</a>
+      <a class="btn btn-quiet" href="https://github.com/profilebiome/qr-screen/raw/main/pc/QR-Screen-Updater.exe">Instalador para PC</a>
+    </div>
+  </section>
 </main>
 
+<script src="web/qrcode.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var STORAGE_KEY = 'qrscreen.codes.v1';
+  var form = document.getElementById('qr-form');
+  var grid = document.getElementById('qr-grid');
+  var empty = document.getElementById('qr-empty');
+  var nameInput = document.getElementById('qr-name');
+  var contentInput = document.getElementById('qr-content');
+  var infoInput = document.getElementById('qr-info');
+
+  if (!form || !grid || !window.qrcode) {
+    if (empty) {
+      empty.textContent = window.qrcode
+        ? 'No se pudo iniciar la sección de códigos.'
+        : 'No se pudo cargar el generador de QR. Revisa la conexión y recarga.';
+    }
+    return;
+  }
+
+  var utf8 = window.qrcode.stringToBytesFuncs && window.qrcode.stringToBytesFuncs['UTF-8'];
+  if (utf8) {
+    window.qrcode.stringToBytes = utf8;
+  }
+
+  function load() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      var list = raw ? JSON.parse(raw) : [];
+      return Array.isArray(list) ? list : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function save(list) {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    } catch (e) {
+      /* cuota llena o modo privado: se queda en memoria */
+    }
+  }
+
+  function detectType(text) {
+    var t = (text || '').trim().toLowerCase();
+    if (t.indexOf('wifi:') === 0) return 'Wi-Fi';
+    if (t.indexOf('begin:vcard') === 0 || t.indexOf('mecard:') === 0) return 'Contacto';
+    if (t.indexOf('otpauth://') === 0) return '2FA';
+    if (t.indexOf('mailto:') === 0) return 'Correo';
+    if (t.indexOf('tel:') === 0) return 'Teléfono';
+    if (t.indexOf('sms:') === 0) return 'SMS';
+    if (t.indexOf('geo:') === 0) return 'Ubicación';
+    if (t.indexOf('bitcoin:') === 0 || t.indexOf('upi:') === 0) return 'Pago';
+    if (/^https?:\/\//.test(t) || /^www\./.test(t)) return 'Enlace';
+    return 'Texto';
+  }
+
+  function openable(text) {
+    return /^(https?:\/\/|www\.|mailto:|tel:)/i.test((text || '').trim());
+  }
+
+  function qrImage(text) {
+    try {
+      var qr = window.qrcode(0, 'M');
+      qr.addData(text, 'Byte');
+      qr.make();
+      return qr.createDataURL(4, 8);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function downloadPng(text, name) {
+    var src = qrImage(text);
+    if (!src) return;
+    var img = new Image();
+    img.onload = function () {
+      var size = 1024;
+      var canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      var ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, size, size);
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(img, 0, 0, size, size);
+      var link = document.createElement('a');
+      link.href = canvas.toDataURL('image/png');
+      link.download = (name || 'qr').replace(/[^\w\-]+/g, '-').replace(/^-+|-+$/g, '') + '.png';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    };
+    img.src = src;
+  }
+
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).catch(function () {});
+      return;
+    }
+    var area = document.createElement('textarea');
+    area.value = text;
+    area.setAttribute('readonly', '');
+    area.style.position = 'fixed';
+    area.style.opacity = '0';
+    document.body.appendChild(area);
+    area.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    area.remove();
+  }
+
+  function button(label, handler, danger) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = label;
+    if (danger) b.className = 'danger';
+    b.addEventListener('click', handler);
+    return b;
+  }
+
+  function render() {
+    var list = load();
+    grid.textContent = '';
+    if (!list.length) {
+      grid.hidden = true;
+      empty.hidden = false;
+      return;
+    }
+    empty.hidden = true;
+    grid.hidden = false;
+    list.forEach(function (item) {
+      var card = document.createElement('article');
+      card.className = 'code-card';
+
+      var img = document.createElement('img');
+      img.alt = 'Código QR de ' + (item.name || 'tu código');
+      img.src = qrImage(item.content);
+      card.appendChild(img);
+
+      var name = document.createElement('h3');
+      name.className = 'code-name';
+      name.textContent = item.name || item.content;
+      card.appendChild(name);
+
+      var meta = document.createElement('p');
+      meta.className = 'code-meta';
+      meta.textContent = detectType(item.content);
+      card.appendChild(meta);
+
+      if (item.info) {
+        var info = document.createElement('p');
+        info.className = 'code-info';
+        info.textContent = item.info;
+        card.appendChild(info);
+      }
+
+      var actions = document.createElement('div');
+      actions.className = 'code-actions';
+      actions.appendChild(button('Copiar', function () { copyText(item.content); }));
+      if (openable(item.content)) {
+        actions.appendChild(button('Abrir', function () {
+          window.open(item.content, '_blank', 'noopener');
+        }));
+      }
+      actions.appendChild(button('PNG', function () { downloadPng(item.content, item.name); }));
+      actions.appendChild(button('Eliminar', function () {
+        if (!window.confirm('¿Eliminar «' + (item.name || 'este código') + '»?')) return;
+        save(load().filter(function (x) { return x.id !== item.id; }));
+        render();
+      }, true));
+      card.appendChild(actions);
+
+      grid.appendChild(card);
+    });
+  }
+
+  form.addEventListener('submit', function (event) {
+    event.preventDefault();
+    var content = (contentInput.value || '').trim();
+    if (!content) {
+      contentInput.focus();
+      return;
+    }
+    var list = load();
+    list.unshift({
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      name: (nameInput.value || '').trim(),
+      content: content,
+      info: (infoInput.value || '').trim(),
+      at: Date.now()
+    });
+    save(list);
+    form.reset();
+    render();
+  });
+
+  render();
+})();
+
+</script>
 </body>
 </html>

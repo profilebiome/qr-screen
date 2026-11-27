@@ -3,7 +3,7 @@
 App Android que lee códigos QR **directamente de la pantalla del celular**. No usa la cámara:
 captura la pantalla con `MediaProjection` y decodifica los píxeles con ZXing.
 
-**Descargar:** [APK firmado 1.2.0](dist/QR-Screen-1.2.0.apk) · **Página web:** <https://profilebiome.github.io/qr-screen/>
+**Descargar:** [APK firmado 1.3.0](dist/QR-Screen-1.3.0.apk) · **Página web:** <https://profilebiome.github.io/qr-screen/>
 
 ![Icono de QR Screen](web/icon.png)
 
@@ -43,7 +43,8 @@ vez.
 
 `pc/QR-Screen-Updater.exe` es un actualizador de escritorio: detecta el teléfono por USB con ADB,
 lee la versión instalada, consulta la publicada en GitHub y la instala con `adb install -r` sin pasar
-por el gestor de archivos. Requiere Windows 10/11, .NET Framework 4.8 (viene de serie) y las
+por el gestor de archivos. El botón **Descargar APK** guarda la última versión en el PC aunque no
+haya teléfono conectado. Requiere Windows 10/11, .NET Framework 4.8 (viene de serie) y las
 Platform-Tools de Android (`adb.exe`; el programa lo busca o permite elegirlo con **Buscar adb…**).
 
 Descarga: <https://github.com/profilebiome/qr-screen/raw/main/pc/QR-Screen-Updater.exe>
@@ -69,15 +70,19 @@ Descarga: <https://github.com/profilebiome/qr-screen/raw/main/pc/QR-Screen-Updat
   guarda para la próxima vez.
 - **Desde imagen**: decodifica una foto o captura de la galería, o una imagen compartida a QR Screen.
 - **Historial**: últimas 100 lecturas, guardadas solo en el dispositivo, con copiar/abrir/compartir.
-- **Crear QR**: pantalla «Crear QR» con contenido y nombre, tipo detectado (enlace, Wi-Fi, contacto,
-  correo, teléfono, pago, 2FA…), vista previa en vivo y guardado.
-- **Mis códigos**: galería propia con miniatura, nombre, tipo y fecha; detalle con copiar, abrir,
-  compartir el PNG, guardar en la galería del teléfono (Android 10+), renombrar y eliminar.
+- **Crear QR**: pantalla «Crear QR» con contenido, nombre e **información**, tipo detectado (enlace,
+  Wi-Fi, contacto, correo, teléfono, pago, 2FA…), vista previa en vivo y guardado.
+- **Mis códigos**: barra horizontal de códigos guardados en la pantalla principal y galería completa
+  con miniatura, nombre, tipo, fecha e información; detalle con copiar, abrir, compartir el PNG,
+  guardar en la galería del teléfono (Android 10+), renombrar y eliminar.
+- **Web**: sección «Tus códigos» que crea QR en el navegador y los guarda en `localStorage` (nombre,
+  enlace e información, copiar, abrir, descargar PNG, eliminar), con el generador incluido en
+  `web/qrcode.js` (sin depender de un CDN).
 - **Sin cámara**: el manifest no declara `android.permission.CAMERA`.
 
 ## Instalar
 
-1. Copia `dist/QR-Screen-1.2.0.apk` al teléfono (cable, Drive, Telegram…).
+1. Copia `dist/QR-Screen-1.3.0.apk` al teléfono (cable, Drive, Telegram…).
 2. Ábrelo y acepta «Instalar apps desconocidas» para el explorador/gestor de archivos.
 3. Al abrir la app:
    - concede **Mostrar sobre otras apps** (visor y tarjeta de resultados),
@@ -104,7 +109,7 @@ publicar en Play Store. Para instalar igualmente:
 ### Instalar por USB (sin avisos del gestor de archivos)
 
 Con depuración USB activada, ejecuta `instalar-adb.bat` en Windows (o a mano:
-`adb install -r dist/QR-Screen-1.2.0.apk`). Es la vía más limpia y permite ver el motivo exacto si
+`adb install -r dist/QR-Screen-1.3.0.apk`). Es la vía más limpia y permite ver el motivo exacto si
 la instalación falla.
 
 ### ¿Es maliciosa?
@@ -156,8 +161,8 @@ sin firma y `assembleDebug` sigue funcionando.
 Comprobar la firma y los permisos:
 
 ```bash
-apksigner verify -v --print-certs dist/QR-Screen-1.2.0.apk
-aapt2 dump badging dist/QR-Screen-1.2.0.apk | findstr permission
+apksigner verify -v --print-certs dist/QR-Screen-1.3.0.apk
+aapt2 dump badging dist/QR-Screen-1.3.0.apk | findstr permission
 ```
 
 Firma: keystore propio (RSA 2048, esquemas v2 y v3). La clave no forma parte del repositorio
@@ -196,6 +201,7 @@ app/src/main/java/com/drako/qrscreen/
   Ui.java / HeroArtView.java  estilos y dibujo de la ilustración
 pc/QR-Screen-Updater.cs    actualizador de escritorio (C#, WinForms)
 version.json               versión publicada que leen la app y el PC
+web/qrcode.js              generador de QR del navegador (MIT, incluido)
 ```
 
 ## Límites conocidos

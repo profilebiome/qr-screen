@@ -34,6 +34,7 @@ namespace QrScreenUpdater
         Button installButton;
         Button checkButton;
         Button adbButton;
+        Button downloadButton;
         string adbPath;
         string serial;
         int installedCode = -1;
@@ -59,8 +60,8 @@ namespace QrScreenUpdater
         public MainForm()
         {
             Text = "QR Screen Updater";
-            ClientSize = new Size(760, 560);
-            MinimumSize = new Size(700, 520);
+            ClientSize = new Size(760, 610);
+            MinimumSize = new Size(700, 570);
             StartPosition = FormStartPosition.CenterScreen;
             BackColor = Ink;
             ForeColor = Paper;
@@ -93,11 +94,21 @@ namespace QrScreenUpdater
             installButton.Enabled = false;
             installButton.Click += delegate { InstallUpdate(); };
 
-            adbButton = MakeButton("Buscar adb…", 368, 178, 120, false);
+            downloadButton = MakeButton("Descargar APK", 368, 178, 150, false);
+            downloadButton.Click += delegate { DownloadApk(); };
+
+            adbButton = MakeButton("Buscar adb…", 530, 178, 110, false);
             adbButton.Click += delegate { ChooseAdb(); };
 
-            Button adbHelp = MakeButton("Descargar platform-tools", 500, 178, 236, false);
+            Button adbHelp = MakeButton("Descargar platform-tools", 24, 224, 236, false);
             adbHelp.Click += delegate { OpenUrl(PlatformToolsUrl); };
+
+            Label hint = new Label();
+            hint.Text = "«Descargar APK» guarda la última versión en el PC aunque no haya teléfono conectado.";
+            hint.ForeColor = Muted;
+            hint.AutoSize = true;
+            hint.Location = new Point(274, 234);
+            Controls.Add(hint);
 
             log = new TextBox();
             log.Multiline = true;
@@ -107,8 +118,8 @@ namespace QrScreenUpdater
             log.ForeColor = Paper;
             log.BorderStyle = BorderStyle.None;
             log.Font = new Font("Consolas", 9f);
-            log.Location = new Point(26, 232);
-            log.Size = new Size(708, 300);
+            log.Location = new Point(26, 276);
+            log.Size = new Size(708, 308);
             log.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom;
             Controls.Add(log);
 
@@ -383,6 +394,64 @@ namespace QrScreenUpdater
             cancel.Parent = f;
             cancel.Click += delegate { f.Close(); };
             return f;
+        }
+
+        void DownloadApk()
+        {
+            if (latestApk == null)
+            {
+                MessageBox.Show("Comprueba primero si hay una versión publicada.", "QR Screen Updater");
+                return;
+            }
+            using (SaveFileDialog dialog = new SaveFileDialog())
+            {
+                dialog.Title = "Guardar QR Screen";
+                dialog.Filter = "APK (*.apk)|*.apk";
+                dialog.FileName = "QR-Screen-" + latestName + ".apk";
+                if (dialog.ShowDialog(this) != DialogResult.OK)
+                {
+                    return;
+                }
+                string destination = dialog.FileName;
+                downloadButton.Enabled = false;
+                new Thread(delegate()
+                {
+                    try
+                    {
+                        Log("Descargando " + latestName + " a " + destination + "…");
+                        using (WebClient client = new WebClient())
+                        {
+                            client.Headers["User-Agent"] = "QR-Screen-Updater";
+                            client.DownloadFile(latestApk, destination);
+                        }
+                        string hash = Sha256(destination);
+                        Log("SHA-256: " + hash);
+                        if (latestSha.Length > 0 && !hash.Equals(latestSha, StringComparison.OrdinalIgnoreCase))
+                        {
+                            File.Delete(destination);
+                            Log("El archivo no coincide con el SHA-256 publicado. Se borró.");
+                            BeginInvoke(new Action(delegate { downloadButton.Enabled = true; }));
+                            return;
+                        }
+                        Log("Guardado. Ya puedes copiarlo al teléfono o instalarlo por USB.");
+                        BeginInvoke(new Action(delegate
+                        {
+                            downloadButton.Enabled = true;
+                            if (MessageBox.Show("APK guardado en:\n" + destination + "\n\n¿Abrir la carpeta?",
+                                    "QR Screen Updater", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                            {
+                                try { Process.Start("explorer.exe", "/select,\"" + destination + "\""); }
+                                catch { }
+                            }
+                        }));
+                    }
+                    catch (Exception ex)
+                    {
+                        Log("Error al descargar: " + ex.Message);
+                        BeginInvoke(new Action(delegate { downloadButton.Enabled = true; }));
+                    }
+                }).Start();
+            }
         }
 
         void ChooseAdb()

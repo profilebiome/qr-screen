@@ -27,6 +27,7 @@ public class CreateQrActivity extends Activity {
 
     private EditText contentInput;
     private EditText nameInput;
+    private EditText infoInput;
     private TextView typeChip;
     private ImageView preview;
     private TextView previewHint;
@@ -100,6 +101,15 @@ public class CreateQrActivity extends Activity {
         LinearLayout.LayoutParams hintLp = Ui.matchWrap();
         hintLp.topMargin = Ui.px(this, 8);
         nameCard.addView(nameHint, hintLp);
+
+        TextView infoLabel = label("Información (opcional)");
+        LinearLayout.LayoutParams infoLabelLp = Ui.matchWrap();
+        infoLabelLp.topMargin = Ui.px(this, 14);
+        nameCard.addView(infoLabel, infoLabelLp);
+        infoInput = input("Para qué es, dónde va, notas…", 2);
+        LinearLayout.LayoutParams infoLp = Ui.matchWrap();
+        infoLp.topMargin = Ui.px(this, 8);
+        nameCard.addView(infoInput, infoLp);
         add(col, nameCard, 10);
 
         // vista previa
@@ -281,8 +291,9 @@ public class CreateQrActivity extends Activity {
             return;
         }
         String name = nameInput.getText().toString().trim();
+        String info = infoInput.getText().toString().trim();
         String type = QrStore.detectType(content);
-        QrStore.Entry entry = QrStore.add(this, name, content, type);
+        QrStore.Entry entry = QrStore.add(this, name, content, type, info);
         if (entry == null) {
             Actions.toast(this, "Límite de 200 códigos: borra alguno en Mis códigos");
             return;

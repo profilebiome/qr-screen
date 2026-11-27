@@ -317,6 +317,17 @@ public class GalleryActivity extends Activity {
         metaLp.topMargin = Ui.px(this, 3);
         card.addView(meta, metaLp);
 
+        if (entry.info != null && !entry.info.isEmpty()) {
+            TextView info = Ui.text(this, entry.info, 12f, 0xFFA8B6C9);
+            info.setGravity(Gravity.CENTER);
+            info.setLineSpacing(Ui.dp(this, 2), 1f);
+            LinearLayout.LayoutParams infoLp = Ui.matchWrap();
+            infoLp.topMargin = Ui.px(this, 8);
+            infoLp.leftMargin = Ui.px(this, 10);
+            infoLp.rightMargin = Ui.px(this, 10);
+            card.addView(info, infoLp);
+        }
+
         ScrollView scroll = new ScrollView(this);
         scroll.setVerticalScrollBarEnabled(false);
         TextView content = Ui.text(this, entry.content, 12.5f, 0xFFDCE6F2);

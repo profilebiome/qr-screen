@@ -17,13 +17,15 @@ final class QrStore {
         final String name;
         final String content;
         final String type;
+        final String info;
         final long createdAt;
 
-        Entry(long id, String name, String content, String type, long createdAt) {
+        Entry(long id, String name, String content, String type, String info, long createdAt) {
             this.id = id;
             this.name = name;
             this.content = content;
             this.type = type;
+            this.info = info;
             this.createdAt = createdAt;
         }
     }
@@ -60,14 +62,15 @@ final class QrStore {
                     continue;
                 }
                 items.add(new Entry(o.optLong("id", 0), o.optString("name", ""), content,
-                        o.optString("type", TYPE_TEXT), o.optLong("createdAt", 0)));
+                        o.optString("type", TYPE_TEXT), o.optString("info", ""),
+                        o.optLong("createdAt", 0)));
             }
         } catch (Throwable ignored) {
         }
         return items;
     }
 
-    static Entry add(Context c, String name, String content, String type) {
+    static Entry add(Context c, String name, String content, String type, String info) {
         if (content == null || content.trim().isEmpty()) {
             return null;
         }
@@ -80,7 +83,8 @@ final class QrStore {
         if (cleanName.isEmpty()) {
             cleanName = defaultName(content, type);
         }
-        Entry entry = new Entry(id, cleanName, content.trim(), type, id);
+        Entry entry = new Entry(id, cleanName, content.trim(), type,
+                info == null ? "" : info.trim(), id);
         items.add(0, entry);
         save(c, items);
         return entry;
@@ -93,7 +97,7 @@ final class QrStore {
             if (e.id == id) {
                 String clean = name == null ? "" : name.trim();
                 out.add(new Entry(e.id, clean.isEmpty() ? defaultName(e.content, e.type) : clean,
-                        e.content, e.type, e.createdAt));
+                        e.content, e.type, e.info, e.createdAt));
             } else {
                 out.add(e);
             }
@@ -129,6 +133,7 @@ final class QrStore {
                 o.put("name", e.name);
                 o.put("content", e.content);
                 o.put("type", e.type);
+                o.put("info", e.info);
                 o.put("createdAt", e.createdAt);
                 arr.put(o);
             } catch (Throwable ignored) {
