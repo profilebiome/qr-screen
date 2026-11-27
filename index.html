@@ -22,6 +22,10 @@
 /* Hallmark · reworded "El QR ya está en tu pantalla" a "El QR está en tu pantalla" · el titular entra en el presupuesto de palabras del gate 58 */
 /* Hallmark · reworded "Devuelve el contenido" a "Devuelve el texto" · la tarjeta devuelve texto y así lo llama el resto de la página */
 /* Hallmark · reworded "dist/QR-Screen-1.0.1.apk" a "dist/QR-Screen-1.1.0.apk" · el APK publicado pasa a la versión con generador de códigos */
+/* Hallmark · dropped Ficha del APK · el usuario pidió quitar la ficha técnica y el pie de la página */
+/* Hallmark · dropped https://github.com/profilebiome/qr-screen#instalar · el pie se retiró a petición y la guía sigue enlazada desde Instalar */
+/* Hallmark · dropped 2026 · el pie con el año se retiró a petición del usuario */
+/* Hallmark · dropped ficha-titulo · la sección de ficha técnica se retiró a petición del usuario */
 
 :root {
   --bg: #060706;
@@ -406,59 +410,7 @@ h2 {
   font-size: 0.86rem;
 }
 
-/* ------------------------------------------------------------------ spec */
 
-.spec {
-  margin: 0;
-  border-top: 1px solid var(--line);
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-
-.spec > div {
-  border-bottom: 1px solid var(--line);
-  border-left: 1px solid var(--line);
-  padding: 0.95rem 1rem;
-}
-.spec > div:nth-child(4n + 1) { border-left: 0; }
-
-.spec dt {
-  font-size: 0.78rem;
-  color: var(--muted-dim);
-  margin-bottom: 0.3rem;
-}
-
-.spec dd {
-  margin: 0;
-  font-family: var(--mono);
-  font-size: 0.84rem;
-  line-height: 1.45;
-  color: var(--text);
-}
-
-.spec .wide { grid-column: 1 / -1; border-left: 0; }
-
-/* ------------------------------------------------------------------ foot */
-
-.site-foot {
-  border-top: 1px solid var(--line);
-  padding-block: 1.75rem 2.25rem;
-  color: var(--muted-dim);
-  font-size: 0.84rem;
-}
-
-.foot-inner {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem 2rem;
-  align-items: baseline;
-  justify-content: space-between;
-}
-
-.foot-inner p { margin: 0; }
-.site-foot a { color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--line); }
-.site-foot a:hover { color: var(--text); border-color: var(--mint); }
-.site-foot a:active { color: var(--mint); }
 
 /* ------------------------------------------------------------------ states */
 
@@ -488,9 +440,6 @@ button:focus-visible {
   .install { grid-template-columns: minmax(0, 1fr); }
   .feature { grid-template-columns: 3rem minmax(0, 1fr); gap: 0.35rem 1rem; }
   .feature p { grid-column: 2; }
-  .spec { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .spec > div:nth-child(4n + 1) { border-left: 1px solid var(--line); }
-  .spec > div:nth-child(odd) { border-left: 0; }
 }
 
 @media (max-width: 560px) {
@@ -499,8 +448,6 @@ button:focus-visible {
   .hero { padding-block: 1.5rem 2.25rem; }
   .actions .btn { width: 100%; }
   .actions .btn-quiet { width: auto; }
-  .spec { grid-template-columns: minmax(0, 1fr); }
-  .spec > div { border-left: 0; }
   .feature { grid-template-columns: minmax(0, 1fr); }
   .feature p { grid-column: auto; }
   .feature .num { font-size: 1.4rem; }
@@ -630,31 +577,7 @@ button:focus-visible {
     </div>
   </section>
 
-  <section class="section" aria-labelledby="ficha-titulo">
-    <div class="wrap">
-      <div class="section-head">
-        <h2 id="ficha-titulo">Ficha del APK</h2>
-              </div>
-      <dl class="spec">
-        <div><dt>Versión</dt><dd>1.1.0</dd></div>
-        <div><dt>Tamaño</dt><dd>304 KB</dd></div>
-        <div><dt>Android</dt><dd>7.0 o superior</dd></div>
-        <div><dt>Internet</dt><dd>ninguno</dd></div>
-        <div><dt>Permisos</dt><dd>superposición, notificaciones, captura, vibración</dd></div>
-        <div><dt>Decodificador</dt><dd>ZXing 3.5.3</dd></div>
-        <div><dt>Firma</dt><dd>v2 + v3</dd></div>
-        <div><dt>Licencia</dt><dd>MIT</dd></div>
-        <div class="wide"><dt>SHA-256 del APK</dt><dd>3fc685c87206c2f7f183f4e77ece92c571e34a0aac0e5bbf5ddab16191e12d24</dd></div>
-      </dl>
-    </div>
-  </section>
 </main>
 
-<footer class="site-foot">
-  <div class="wrap foot-inner">
-    <p>QR Screen, 2026.</p>
-    <p><a href="https://github.com/profilebiome/qr-screen">Código en GitHub</a> / <a href="https://github.com/profilebiome/qr-screen#instalar">Guía de instalación</a></p>
-  </div>
-</footer>
 </body>
 </html>
