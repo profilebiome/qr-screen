@@ -1,0 +1,3 @@
+-dontwarn java.awt.**
+-dontwarn javax.imageio.**
+-keep class com.google.zxing.** { *; }

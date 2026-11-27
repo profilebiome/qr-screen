@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">QR Screen</string>
+    <string name="channel_name">Escaneo de pantalla</string>
+    <string name="channel_desc">Notificación del escáner activo</string>
+    <string name="notif_title">QR Screen escaneando</string>
+    <string name="notif_text">Buscando códigos en la pantalla…</string>
+    <string name="notif_stop">Detener</string>
+</resources>
