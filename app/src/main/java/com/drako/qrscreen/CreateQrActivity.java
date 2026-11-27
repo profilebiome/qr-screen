@@ -17,8 +17,12 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.HorizontalScrollView;
 import android.widget.ScrollView;
 import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /** Crear un código QR con nombre y contenido, con vista previa en vivo. */
 public class CreateQrActivity extends Activity {
@@ -89,6 +93,9 @@ public class CreateQrActivity extends Activity {
         chipLp.topMargin = Ui.px(this, 10);
         contentCard.addView(typeChip, chipLp);
         add(col, contentCard, 16);
+
+        // rellenar con mi tarjeta o un contacto
+        add(col, buildFillFromCard(), 10);
 
         // nombre
         LinearLayout nameCard = card();
@@ -180,6 +187,61 @@ public class CreateQrActivity extends Activity {
         contentInput.addTextChangedListener(new Watcher(this::scheduleUpdate));
         nameInput.addTextChangedListener(new Watcher(this::scheduleUpdate));
         return root;
+    }
+
+    /** Chips con mi tarjeta y los contactos guardados en Herramientas. */
+    private View buildFillFromCard() {
+        final List<ProfileStore.Person> people = new ArrayList<>();
+        ProfileStore.Person me = ProfileStore.owner(this);
+        if (!me.isEmpty()) {
+            people.add(me);
+        }
+        people.addAll(ProfileStore.contacts(this));
+        if (people.isEmpty()) {
+            View spacer = new View(this);
+            spacer.setVisibility(View.GONE);
+            return spacer;
+        }
+
+        LinearLayout card = card();
+        card.addView(label("Rellenar con"));
+        TextView hint = Ui.text(this, "Crea un contacto con nombre, email y teléfono.",
+                10.5f, Ui.TEXT_DIM);
+        LinearLayout.LayoutParams hintLp = Ui.matchWrap();
+        hintLp.topMargin = Ui.px(this, 4);
+        card.addView(hint, hintLp);
+
+        HorizontalScrollView scroll = new HorizontalScrollView(this);
+        scroll.setHorizontalScrollBarEnabled(false);
+        scroll.setClipToPadding(false);
+        LinearLayout chips = Ui.row(this);
+        for (int i = 0; i < people.size(); i++) {
+            final ProfileStore.Person person = people.get(i);
+            boolean isOwner = i == 0 && !me.isEmpty();
+            String labelText = isOwner ? "Mi tarjeta" : person.label();
+            TextView chip = Ui.bold(this, labelText, 11f, Ui.ACCENT);
+            chip.setPadding(Ui.px(this, 12), Ui.px(this, 7), Ui.px(this, 12), Ui.px(this, 7));
+            chip.setBackground(Ui.ripple(Ui.round(0x1F34D399, Ui.dp(this, 20)), 0x44FFFFFF));
+            chip.setOnClickListener(v -> fillFrom(person));
+            LinearLayout.LayoutParams chipLp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            chipLp.setMarginEnd(Ui.px(this, 8));
+            chips.addView(chip, chipLp);
+        }
+        scroll.addView(chips, new HorizontalScrollView.LayoutParams(
+                HorizontalScrollView.LayoutParams.WRAP_CONTENT,
+                HorizontalScrollView.LayoutParams.WRAP_CONTENT));
+        LinearLayout.LayoutParams scrollLp = Ui.matchWrap();
+        scrollLp.topMargin = Ui.px(this, 10);
+        card.addView(scroll, scrollLp);
+        return card;
+    }
+
+    private void fillFrom(ProfileStore.Person person) {
+        contentInput.setText(ProfileStore.vcard(person));
+        nameInput.setText(person.name.isEmpty() ? person.label() : person.name);
+        infoInput.setText("Contacto: " + ProfileStore.details(person));
+        Actions.toast(this, "Datos copiados al formulario");
     }
 
     private View buildHeader() {

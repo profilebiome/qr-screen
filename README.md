@@ -3,7 +3,7 @@
 App Android que lee códigos QR **directamente de la pantalla del celular**. No usa la cámara:
 captura la pantalla con `MediaProjection` y decodifica los píxeles con ZXing.
 
-**Descargar:** [APK firmado 1.4.0](dist/QR-Screen-1.4.0.apk) · **Página web:** <https://profilebiome.github.io/qr-screen/>
+**Descargar:** [APK firmado 1.5.0](dist/QR-Screen-1.5.0.apk) · **Página web:** <https://profilebiome.github.io/qr-screen/>
 
 ![Icono de QR Screen](web/icon.png)
 
@@ -75,6 +75,8 @@ Descarga: <https://github.com/profilebiome/qr-screen/raw/main/pc/QR-Screen-Updat
 - **Mis códigos**: barra horizontal de códigos guardados en la pantalla principal y galería completa
   con miniatura, nombre, tipo, fecha e información; detalle con copiar, abrir, compartir el PNG,
   guardar en la galería del teléfono (Android 10+), renombrar y eliminar.
+- **Herramientas** (perilla en la cabecera): tu información personal (nombre, email, teléfono),
+  contactos para los que creas códigos y el buscador de actualizaciones.
 - **Web**: sección «Tus códigos» que crea QR en el navegador y los guarda en `localStorage` (nombre,
   enlace e información, copiar, abrir, descargar PNG, eliminar), con el generador incluido en
   `web/qrcode.js` (sin depender de un CDN).
@@ -82,7 +84,7 @@ Descarga: <https://github.com/profilebiome/qr-screen/raw/main/pc/QR-Screen-Updat
 
 ## Instalar
 
-1. Copia `dist/QR-Screen-1.4.0.apk` al teléfono (cable, Drive, Telegram…).
+1. Copia `dist/QR-Screen-1.5.0.apk` al teléfono (cable, Drive, Telegram…).
 2. Ábrelo y acepta «Instalar apps desconocidas» para el explorador/gestor de archivos.
 3. Al abrir la app:
    - concede **Mostrar sobre otras apps** (visor y tarjeta de resultados),
@@ -109,7 +111,7 @@ publicar en Play Store. Para instalar igualmente:
 ### Instalar por USB (sin avisos del gestor de archivos)
 
 Con depuración USB activada, ejecuta `instalar-adb.bat` en Windows (o a mano:
-`adb install -r dist/QR-Screen-1.4.0.apk`). Es la vía más limpia y permite ver el motivo exacto si
+`adb install -r dist/QR-Screen-1.5.0.apk`). Es la vía más limpia y permite ver el motivo exacto si
 la instalación falla.
 
 ### ¿Es maliciosa?
@@ -161,8 +163,8 @@ sin firma y `assembleDebug` sigue funcionando.
 Comprobar la firma y los permisos:
 
 ```bash
-apksigner verify -v --print-certs dist/QR-Screen-1.4.0.apk
-aapt2 dump badging dist/QR-Screen-1.4.0.apk | findstr permission
+apksigner verify -v --print-certs dist/QR-Screen-1.5.0.apk
+aapt2 dump badging dist/QR-Screen-1.5.0.apk | findstr permission
 ```
 
 Firma: keystore propio (RSA 2048, esquemas v2 y v3). La clave no forma parte del repositorio
@@ -191,6 +193,8 @@ app/src/main/java/com/drako/qrscreen/
   QrImage.java             decodificar desde galería/imagen compartida
   HistoryStore.java        historial en SharedPreferences
   QrStore.java             códigos creados, con nombre, tipo y fecha
+  ProfileStore.java        mi información y contactos para los QR
+  ToolsActivity.java       menú de herramientas (datos, contactos, actualizaciones)
   QrRenderer.java          QR a Bitmap con ZXing
   CreateQrActivity.java    formulario con vista previa en vivo
   GalleryActivity.java     galería de códigos y detalle con acciones

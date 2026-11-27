@@ -144,7 +144,6 @@ public class MainActivity extends Activity {
         }
         addHowItWorks();
         addHistory();
-        addFooter();
         scrollView.post(() -> {
             View child = scrollView.getChildAt(0);
             if (child != null) {
@@ -180,6 +179,16 @@ public class MainActivity extends Activity {
                 LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
         titlesLp.setMarginStart(Ui.px(this, 12));
         header.addView(titles, titlesLp);
+
+        ImageView tools = new ImageView(this);
+        tools.setImageResource(R.drawable.ic_tools);
+        tools.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+        int toolPad = Ui.px(this, 9);
+        tools.setPadding(toolPad, toolPad, toolPad, toolPad);
+        tools.setBackground(Ui.ripple(Ui.round(0xFF14203A, Ui.dp(this, 12)), 0x33FFFFFF));
+        tools.setContentDescription("Herramientas");
+        tools.setOnClickListener(v -> startActivity(new Intent(this, ToolsActivity.class)));
+        header.addView(tools, new LinearLayout.LayoutParams(Ui.px(this, 40), Ui.px(this, 40)));
         add(header, 4);
     }
 
@@ -540,13 +549,6 @@ public class MainActivity extends Activity {
         return one.length() > 90 ? one.substring(0, 90) + "…" : one;
     }
 
-    private void addFooter() {
-        TextView check = Ui.bold(this, "Buscar actualizaciones", 11f, Ui.ACCENT);
-        check.setGravity(Gravity.CENTER);
-        check.setPadding(0, Ui.px(this, 26), 0, Ui.px(this, 4));
-        check.setOnClickListener(v -> Updater.check(this, true));
-        column.addView(check, Ui.matchWrap());
-    }
 
     // ------------------------------------------------------------------ escaneo
 

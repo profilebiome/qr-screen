@@ -48,6 +48,14 @@
             android:windowSoftInputMode="adjustResize" />
 
         <activity
+            android:name=".ToolsActivity"
+            android:exported="false"
+            android:label="@string/tools_title"
+            android:theme="@style/Theme.QRScreen"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|uiMode|smallestScreenSize"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
             android:name=".GalleryActivity"
             android:exported="false"
             android:label="@string/my_qr_title"

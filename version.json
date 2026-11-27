@@ -1,8 +1,8 @@
 {
-  "versionCode": 6,
-  "versionName": "1.4.0",
-  "apk": "https://profilebiome.github.io/qr-screen/dist/QR-Screen-1.4.0.apk",
-  "sha256": "a3e27c645cc2ad422c10cdf9f8fb19597282d9f35c8d50f8bb411ae0e9457144",
-  "notes": "Al escanear un enlace, «Abrir» es la acción principal. También se abren enlaces sin https:// (dominios y wa.me).",
+  "versionCode": 7,
+  "versionName": "1.5.0",
+  "apk": "https://profilebiome.github.io/qr-screen/dist/QR-Screen-1.5.0.apk",
+  "sha256": "3409f44e8b02bf0220da607ae6f2e852570027f1e91c53cafe103175f41cfe7d",
+  "notes": "Herramientas con perilla: tu información, contactos para los que creas QR y buscador de actualizaciones. Al crear un código puedes rellenarlo con tu tarjeta o un contacto.",
   "minSdk": 24
 }
