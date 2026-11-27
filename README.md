@@ -3,7 +3,7 @@
 App Android que lee códigos QR **directamente de la pantalla del celular**. No usa la cámara:
 captura la pantalla con `MediaProjection` y decodifica los píxeles con ZXing.
 
-**Descargar:** [APK firmado 1.5.0](dist/QR-Screen-1.5.0.apk) · **Página web:** <https://profilebiome.github.io/qr-screen/>
+**Descargar:** [APK firmado 1.5.1](dist/QR-Screen-1.5.1.apk) · **Página web:** <https://profilebiome.github.io/qr-screen/>
 
 ![Icono de QR Screen](web/icon.png)
 
@@ -84,7 +84,7 @@ Descarga: <https://github.com/profilebiome/qr-screen/raw/main/pc/QR-Screen-Updat
 
 ## Instalar
 
-1. Copia `dist/QR-Screen-1.5.0.apk` al teléfono (cable, Drive, Telegram…).
+1. Copia `dist/QR-Screen-1.5.1.apk` al teléfono (cable, Drive, Telegram…).
 2. Ábrelo y acepta «Instalar apps desconocidas» para el explorador/gestor de archivos.
 3. Al abrir la app:
    - concede **Mostrar sobre otras apps** (visor y tarjeta de resultados),
@@ -111,7 +111,7 @@ publicar en Play Store. Para instalar igualmente:
 ### Instalar por USB (sin avisos del gestor de archivos)
 
 Con depuración USB activada, ejecuta `instalar-adb.bat` en Windows (o a mano:
-`adb install -r dist/QR-Screen-1.5.0.apk`). Es la vía más limpia y permite ver el motivo exacto si
+`adb install -r dist/QR-Screen-1.5.1.apk`). Es la vía más limpia y permite ver el motivo exacto si
 la instalación falla.
 
 ### ¿Es maliciosa?
@@ -163,8 +163,8 @@ sin firma y `assembleDebug` sigue funcionando.
 Comprobar la firma y los permisos:
 
 ```bash
-apksigner verify -v --print-certs dist/QR-Screen-1.5.0.apk
-aapt2 dump badging dist/QR-Screen-1.5.0.apk | findstr permission
+apksigner verify -v --print-certs dist/QR-Screen-1.5.1.apk
+aapt2 dump badging dist/QR-Screen-1.5.1.apk | findstr permission
 ```
 
 Firma: keystore propio (RSA 2048, esquemas v2 y v3). La clave no forma parte del repositorio

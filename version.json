@@ -1,8 +1,8 @@
 {
-  "versionCode": 7,
-  "versionName": "1.5.0",
-  "apk": "https://profilebiome.github.io/qr-screen/dist/QR-Screen-1.5.0.apk",
-  "sha256": "3409f44e8b02bf0220da607ae6f2e852570027f1e91c53cafe103175f41cfe7d",
-  "notes": "Herramientas con perilla: tu información, contactos para los que creas QR y buscador de actualizaciones. Al crear un código puedes rellenarlo con tu tarjeta o un contacto.",
+  "versionCode": 8,
+  "versionName": "1.5.1",
+  "apk": "https://profilebiome.github.io/qr-screen/dist/QR-Screen-1.5.1.apk",
+  "sha256": "e51fb41425f5c9d36694d1366c0e98d3628cc85c320ccb7a44fc0403e575bf08",
+  "notes": "Herramientas con perilla: tu información, contactos para los que creas QR y buscador de actualizaciones. Icono de llave corregido.",
   "minSdk": 24
 }
