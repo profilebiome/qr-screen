@@ -2,6 +2,16 @@ plugins {
     id 'com.android.application'
 }
 
+// La clave de firma no se publica: vive en keystore.properties (ignorado) o no existe.
+def keystorePropertiesFile = rootProject.file('keystore.properties')
+def keystoreProperties = new Properties()
+if (keystorePropertiesFile.exists()) {
+    keystorePropertiesFile.withInputStream { keystoreProperties.load(it) }
+}
+def releaseStorePath = keystoreProperties.getProperty('storeFile')
+def releaseStoreFile = releaseStorePath ? rootProject.file(releaseStorePath) : null
+def canSignRelease = releaseStoreFile != null && releaseStoreFile.exists()
+
 android {
     namespace 'com.drako.qrscreen'
     compileSdk 34
@@ -16,14 +26,16 @@ android {
     }
 
     signingConfigs {
-        release {
-            storeFile file('../keystore/qrscreen.jks')
-            storePassword 'qrscreen2024'
-            keyAlias 'qrscreen'
-            keyPassword 'qrscreen2024'
-            enableV1Signing true
-            enableV2Signing true
-            enableV3Signing true
+        if (canSignRelease) {
+            release {
+                storeFile releaseStoreFile
+                storePassword keystoreProperties.getProperty('storePassword')
+                keyAlias keystoreProperties.getProperty('keyAlias')
+                keyPassword keystoreProperties.getProperty('keyPassword')
+                enableV1Signing true
+                enableV2Signing true
+                enableV3Signing true
+            }
         }
     }
 
@@ -31,11 +43,15 @@ android {
         release {
             minifyEnabled false
             shrinkResources false
-            signingConfig signingConfigs.release
+            if (canSignRelease) {
+                signingConfig signingConfigs.release
+            }
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug {
-            signingConfig signingConfigs.release
+            if (canSignRelease) {
+                signingConfig signingConfigs.release
+            }
         }
     }
 

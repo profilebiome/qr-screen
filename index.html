@@ -1,0 +1,721 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QR Screen: lee QR desde la pantalla del teléfono, sin cámara</title>
+<meta name="description" content="QR Screen es una app Android que lee códigos QR capturando la pantalla del propio teléfono. Sin cámara, sin internet, sin cuenta. APK firmado y código abierto.">
+<meta name="theme-color" content="#070b13">
+<meta property="og:type" content="website">
+<meta property="og:title" content="QR Screen: el lector que mira tu pantalla, no la cámara">
+<meta property="og:description" content="Escanea el QR que ya está en el teléfono: chat, PDF, video o banco. Captura de pantalla y ZXing. APK de 300 KB, sin permiso de internet.">
+<meta property="og:image" content="web/icon-256.png">
+<link rel="icon" href="web/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="web/icon-256.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Hallmark · pre-emit critique: P5 H5 E4 S5 R4 V4 · weakest: R, the capture frame and the live QR already carry the page; nothing else added */
+/* Hallmark · hero: Ledge · el texto se apoya en el borde inferior y el código ocupa el alto de la pantalla */
+/* Hallmark · waive 8 · 300 KB, 1.0.1 y cinco permisos · los numeros salen de la ficha real del APK y no son estimaciones */
+
+:root {
+  --ink: #070b13;
+  --ink-soft: #0a1320;
+  --line: #1b2a3c;
+  --line-soft: #14202d;
+  --paper: #e9f2ec;
+  --muted: #93a6b8;
+  --muted-dim: #6d8095;
+  --mint: #34d399;
+  --mint-deep: #0e9f6e;
+  --mint-ink: #06231a;
+  --mint-glow: rgba(52, 211, 153, 0.16);
+  --mint-haze: rgba(52, 211, 153, 0.06);
+  --mint-wash: rgba(52, 211, 153, 0.08);
+  --mint-tint: rgba(52, 211, 153, 0.1);
+  --mint-shadow: rgba(52, 211, 153, 0.55);
+  --fade-ink: rgba(9, 15, 24, 0.85);
+  --font-display: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Instrument Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", monospace;
+  --measure: 62ch;
+  --wrap: 1120px;
+  --radius: 14px;
+  --nav-h: 5.4rem;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  overflow-x: clip;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  overflow-x: clip;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.6;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(70rem 40rem at 88% -12%, var(--mint-glow), transparent 62%),
+    radial-gradient(50rem 30rem at -10% 8%, var(--mint-haze), transparent 60%);
+  pointer-events: none;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(to right, var(--line-soft) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--line-soft) 1px, transparent 1px);
+  background-size: 96px 96px;
+  opacity: 0.22;
+  mask-image: linear-gradient(to bottom, var(--fade-ink), transparent 72%);
+  -webkit-mask-image: linear-gradient(to bottom, var(--fade-ink), transparent 72%);
+  pointer-events: none;
+}
+
+::selection { background: var(--mint); color: var(--mint-ink); }
+
+a { color: inherit; }
+
+.wrap {
+  width: min(var(--wrap), 100% - clamp(2rem, 6vw, 5rem));
+  margin-inline: auto;
+}
+
+.skip {
+  position: absolute;
+  top: 0.75rem;
+  left: 1rem;
+  padding: 0.7rem 1rem;
+  background: var(--mint);
+  color: var(--mint-ink);
+  font-weight: 600;
+  border-radius: 8px;
+  z-index: 20;
+  transform: translateY(-250%);
+}
+.skip:focus-visible { transform: none; }
+
+/* ------------------------------------------------------------------ nav */
+
+.nav { padding-block: 0.9rem; }
+
+.nav-inner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-height: 3.4rem;
+  padding: 0.25rem 0.35rem 0.25rem 1rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--ink-raise);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  text-decoration: none;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.05rem;
+  letter-spacing: -0.01em;
+}
+
+.brand-mark {
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 8px;
+  background: var(--mint);
+  color: var(--mint-ink);
+  display: grid;
+  place-items: center;
+}
+.brand-mark svg { width: 1.15rem; height: 1.15rem; display: block; }
+
+.version {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--muted-dim);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 0.1rem 0.45rem;
+  margin-left: 0.15rem;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1.4rem;
+  margin-left: auto;
+}
+
+.nav-links a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.94rem;
+}
+.nav-links a:hover { color: var(--paper); }
+.nav-links a:active { color: var(--mint); }
+
+.nav-links a.nav-cta {
+  background: var(--mint);
+  color: var(--mint-ink);
+  border-radius: 9px;
+  padding: 0.5rem 0.9rem;
+  font-weight: 600;
+  font-size: 0.9rem !important;
+  white-space: nowrap;
+}
+.nav-links a.nav-cta:hover { color: var(--mint-ink); filter: brightness(1.06); }
+.nav-links a.nav-cta:active { filter: brightness(0.95); }
+
+/* ------------------------------------------------------------------ hero */
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: clamp(1.5rem, 3vw, 2.75rem);
+  align-content: end;
+  align-items: end;
+  min-height: calc(100svh - var(--nav-h) - 1px);
+  padding-block: 2.5rem 3.5rem;
+}
+
+.hero h1 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(2.3rem, 4.2vw, 3.6rem);
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  margin: 0;
+  max-width: 13ch;
+  overflow-wrap: break-word;
+  min-width: 0;
+  text-wrap: balance;
+}
+
+.hero-lead {
+  max-width: 38ch;
+  margin: 1.5rem 0 0;
+  color: var(--muted);
+  font-size: clamp(1rem, 1.15vw, 1.1rem);
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.25rem;
+  margin-top: 2rem;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  border: 0;
+  border-radius: 12px;
+  padding: 0.78rem 1.3rem;
+  font-family: var(--font-body);
+  font-size: 0.98rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: transform 160ms ease, filter 160ms ease, background-color 160ms ease, border-color 160ms ease;
+}
+
+.btn-primary {
+  background: var(--mint);
+  color: var(--mint-ink);
+  box-shadow: 0 10px 30px -14px var(--mint-shadow);
+}
+.btn-primary:hover { filter: brightness(1.06); transform: translateY(-1px); }
+.btn-primary:active { transform: none; filter: brightness(0.95); }
+
+.btn-quiet {
+  color: var(--paper);
+  border: 1px solid var(--line);
+  background: transparent;
+  padding-inline: 1.1rem;
+}
+.btn-quiet:hover { border-color: var(--mint-deep); background: var(--mint-wash); }
+.btn-quiet:active { transform: none; background: var(--mint-tint); }
+
+.btn svg { width: 1.05rem; height: 1.05rem; display: block; }
+
+.hero-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.6rem;
+  margin: 1.6rem 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--muted-dim);
+  font-size: 0.9rem;
+}
+.hero-facts li { display: inline-flex; align-items: center; }
+.hero-facts li + li { padding-left: 1.6rem; position: relative; }
+.hero-facts li + li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.2em;
+  bottom: 0.2em;
+  width: 1px;
+  background: var(--line);
+}
+
+/* ------------------------------------------------------------------ capture frame */
+
+.capture {
+  margin: 0;
+  justify-self: center;
+  width: min(100%, 26rem);
+}
+
+.capture-frame {
+  position: relative;
+  aspect-ratio: 1;
+  padding: clamp(1.1rem, 2.4vw, 1.6rem);
+  background:
+    radial-gradient(120% 90% at 50% 0%, var(--mint-tint), transparent 58%),
+    var(--ink-soft);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  color: var(--mint);
+  overflow: hidden;
+}
+
+.capture-frame::before,
+.capture-frame::after,
+.capture-corner::before,
+.capture-corner::after {
+  content: "";
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--mint);
+}
+.capture-frame::before { top: 0.7rem; left: 0.7rem; border-right: 0; border-bottom: 0; border-radius: 6px 0 0 0; }
+.capture-frame::after { top: 0.7rem; right: 0.7rem; border-left: 0; border-bottom: 0; border-radius: 0 6px 0 0; }
+.capture-corner::before { bottom: 0.7rem; left: 0.7rem; border-right: 0; border-top: 0; border-radius: 0 0 0 6px; }
+.capture-corner::after { bottom: 0.7rem; right: 0.7rem; border-left: 0; border-top: 0; border-radius: 0 0 6px 0; }
+
+.qr {
+  display: block;
+  width: 100%;
+  height: 100%;
+  color: var(--mint);
+}
+
+.scanline {
+  position: absolute;
+  left: 1.4rem;
+  right: 1.4rem;
+  top: 32%;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(to right, transparent, var(--mint), transparent);
+  opacity: 0.85;
+  animation: sweep 3.4s cubic-bezier(0.5, 0, 0.5, 1) infinite alternate;
+  will-change: transform;
+}
+
+@keyframes sweep {
+  from { transform: translateY(-4.5rem); }
+  to { transform: translateY(9rem); }
+}
+
+.capture figcaption {
+  margin-top: 1rem;
+  color: var(--muted-dim);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  max-width: 36ch;
+}
+
+/* ------------------------------------------------------------------ sections */
+
+.section {
+  padding-block: clamp(3.5rem, 7vw, 6rem);
+  border-top: 1px solid var(--line-soft);
+}
+
+.section-head {
+  max-width: var(--measure);
+  margin-bottom: clamp(2rem, 4vw, 3rem);
+}
+
+h2 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(2rem, 3.5vw, 3.25rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  margin: 0;
+  overflow-wrap: break-word;
+  min-width: 0;
+  text-wrap: balance;
+}
+
+.section-head p {
+  color: var(--muted);
+  margin: 0.8rem 0 0;
+}
+
+/* ------------------------------------------------------------------ what it does */
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  border-top: 1px solid var(--line);
+  padding-top: 1.1rem;
+}
+
+.step h3 {
+  font-family: var(--font-display);
+  font-size: 1.18rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0 0 0.4rem;
+}
+
+.step p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.97rem;
+}
+
+/* ------------------------------------------------------------------ install */
+
+.install {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: start;
+}
+
+.install-note {
+  color: var(--muted);
+  margin: 1rem 0 0;
+  max-width: 34ch;
+}
+
+.install-cta { margin-top: 1.6rem; }
+
+.ordered {
+  counter-reset: step;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+
+.ordered li {
+  counter-increment: step;
+  position: relative;
+  padding: 1rem 0 1rem 2.6rem;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.97rem;
+}
+
+.ordered li::before {
+  content: counter(step, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  top: 1.1rem;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--mint);
+}
+
+.ordered strong { color: var(--paper); font-weight: 600; }
+
+/* ------------------------------------------------------------------ spec sheet */
+
+.spec {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: start;
+}
+
+dl.facts {
+  margin: 0;
+  border-top: 1px solid var(--line);
+}
+
+dl.facts > div {
+  display: grid;
+  grid-template-columns: minmax(7rem, 0.7fr) minmax(0, 1.3fr);
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+dl.facts dt {
+  color: var(--muted-dim);
+  font-size: 0.92rem;
+}
+
+dl.facts dd {
+  margin: 0;
+  font-size: 0.97rem;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-size: 0.84rem;
+  overflow-wrap: anywhere;
+}
+
+.privacy {
+  margin: 1.4rem 0 0;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--line);
+  border-left: 2px solid var(--mint-deep);
+  border-radius: 0 10px 10px 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+  max-width: 42ch;
+}
+
+/* ------------------------------------------------------------------ footer */
+
+.footer {
+  border-top: 1px solid var(--line-soft);
+  padding-block: 2.5rem 3rem;
+  color: var(--muted-dim);
+  font-size: 0.9rem;
+}
+
+.footer-inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 2rem;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.footer-line { margin: 0; }
+.footer .sep { color: var(--muted-dim); padding-inline: 0.35rem; }
+.footer a { color: var(--muted); text-decoration: none; border-bottom: 1px solid var(--line); padding-bottom: 1px; }
+.footer a:hover { color: var(--paper); border-color: var(--mint-deep); }
+.footer a:active { color: var(--mint); }
+
+/* ------------------------------------------------------------------ states */
+
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--mint);
+  outline-offset: 3px;
+  border-radius: 6px;
+  transition: none;
+}
+
+/* ------------------------------------------------------------------ responsive */
+
+@media (max-width: 900px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+    align-items: start;
+    min-height: 0;
+    padding-block: clamp(2.5rem, 8vw, 4rem);
+  }
+  .capture { justify-self: start; width: min(100%, 19rem); }
+  .hero h1 { max-width: 18ch; }
+  .steps { grid-template-columns: minmax(0, 1fr); gap: 1.6rem; }
+  .install, .spec { grid-template-columns: minmax(0, 1fr); }
+  .section { padding-block: clamp(2.5rem, 8vw, 4rem); }
+  .nav-links a:not(.nav-cta):not(.nav-github) { display: none; }
+}
+
+@media (max-width: 520px) {
+  .nav-inner { gap: 0.6rem; min-height: 3.6rem; }
+  .nav-links { gap: 0.6rem; }
+  .nav-github { display: none; }
+  .version { display: none; }
+  .hero-actions { gap: 0.75rem; }
+  .btn { width: 100%; }
+  .btn-quiet { width: auto; }
+  dl.facts > div { grid-template-columns: minmax(0, 1fr); gap: 0.15rem; }
+  .ordered li { padding-left: 2.4rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .scanline { animation: none; top: 50%; }
+  .btn { transition: none; }
+  .btn-primary:hover { transform: none; }
+  * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#que-hace">Saltar al contenido</a>
+
+<header class="nav">
+  <div class="wrap nav-inner">
+    <a class="brand" href="./">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 9V5.5A1.5 1.5 0 0 1 5.5 4H9"/>
+          <path d="M15 4h3.5A1.5 1.5 0 0 1 20 5.5V9"/>
+          <path d="M20 15v3.5a1.5 1.5 0 0 1-1.5 1.5H15"/>
+          <path d="M9 20H5.5A1.5 1.5 0 0 1 4 18.5V15"/>
+        </svg>
+      </span>
+      QR Screen
+      <span class="version">1.0.1</span>
+    </a>
+    <nav class="nav-links" aria-label="Principal">
+      <a href="#que-hace">Qué hace</a>
+      <a href="#instalar">Instalar</a>
+      <a class="nav-github" href="https://github.com/profilebiome/qr-screen">GitHub</a>
+      <a class="nav-cta" href="dist/QR-Screen-1.0.1.apk" download>Descargar APK</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="wrap hero" aria-labelledby="titulo">
+    <div>
+      <h1 id="titulo">El QR ya está en tu pantalla</h1>
+      <p class="hero-lead">Sin cámara: captura la pantalla y lee el código que está ahí.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="dist/QR-Screen-1.0.1.apk" download>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 4v11"/>
+            <path d="m7.5 10.5 4.5 4.5 4.5-4.5"/>
+            <path d="M5 19h14"/>
+          </svg>
+          Descargar APK
+        </a>
+        <a class="btn btn-quiet" href="#instalar">Ver cómo instalar</a>
+      </div>
+      <ul class="hero-facts">
+        <li>Android 7.0+</li>
+        <li>300 KB</li>
+        <li>Sin internet</li>
+      </ul>
+    </div>
+
+    <figure class="capture">
+      <div class="capture-frame">
+        <span class="capture-corner" aria-hidden="true"></span>
+        <svg class="qr" viewBox="0 0 33 33" role="img" aria-label="Código QR que enlaza al repositorio de QR Screen en GitHub" shape-rendering="crispEdges">
+          <path fill="currentColor" d="M2 2h7v1h-7z M10 2h1v1h-1z M12 2h1v1h-1z M14 2h2v1h-2z M17 2h1v1h-1z M19 2h2v1h-2z M22 2h1v1h-1z M24 2h7v1h-7z M2 3h1v1h-1z M8 3h1v1h-1z M12 3h1v1h-1z M15 3h3v1h-3z M19 3h2v1h-2z M22 3h1v1h-1z M24 3h1v1h-1z M30 3h1v1h-1z M2 4h1v1h-1z M4 4h3v1h-3z M8 4h1v1h-1z M10 4h1v1h-1z M14 4h2v1h-2z M18 4h1v1h-1z M20 4h1v1h-1z M24 4h1v1h-1z M26 4h3v1h-3z M30 4h1v1h-1z M2 5h1v1h-1z M4 5h3v1h-3z M8 5h1v1h-1z M11 5h1v1h-1z M13 5h1v1h-1z M15 5h1v1h-1z M19 5h2v1h-2z M24 5h1v1h-1z M26 5h3v1h-3z M30 5h1v1h-1z M2 6h1v1h-1z M4 6h3v1h-3z M8 6h1v1h-1z M11 6h1v1h-1z M13 6h1v1h-1z M15 6h1v1h-1z M18 6h2v1h-2z M21 6h2v1h-2z M24 6h1v1h-1z M26 6h3v1h-3z M30 6h1v1h-1z M2 7h1v1h-1z M8 7h1v1h-1z M10 7h1v1h-1z M12 7h5v1h-5z M18 7h3v1h-3z M22 7h1v1h-1z M24 7h1v1h-1z M30 7h1v1h-1z M2 8h7v1h-7z M10 8h1v1h-1z M12 8h1v1h-1z M14 8h1v1h-1z M16 8h1v1h-1z M18 8h1v1h-1z M20 8h1v1h-1z M22 8h1v1h-1z M24 8h7v1h-7z M12 9h3v1h-3z M17 9h2v1h-2z M21 9h2v1h-2z M2 10h1v1h-1z M4 10h1v1h-1z M8 10h2v1h-2z M12 10h3v1h-3z M16 10h2v1h-2z M21 10h1v1h-1z M25 10h1v1h-1z M28 10h1v1h-1z M30 10h1v1h-1z M4 11h4v1h-4z M9 11h1v1h-1z M11 11h2v1h-2z M14 11h1v1h-1z M16 11h1v1h-1z M21 11h2v1h-2z M25 11h1v1h-1z M27 11h1v1h-1z M5 12h1v1h-1z M8 12h1v1h-1z M14 12h1v1h-1z M17 12h1v1h-1z M22 12h1v1h-1z M24 12h1v1h-1z M30 12h1v1h-1z M6 13h2v1h-2z M9 13h1v1h-1z M11 13h1v1h-1z M14 13h1v1h-1z M16 13h4v1h-4z M21 13h1v1h-1z M24 13h2v1h-2z M27 13h1v1h-1z M29 13h2v1h-2z M2 14h1v1h-1z M4 14h1v1h-1z M7 14h2v1h-2z M13 14h1v1h-1z M16 14h2v1h-2z M19 14h3v1h-3z M23 14h1v1h-1z M26 14h3v1h-3z M30 14h1v1h-1z M2 15h2v1h-2z M7 15h1v1h-1z M10 15h1v1h-1z M12 15h2v1h-2z M17 15h2v1h-2z M20 15h1v1h-1z M22 15h1v1h-1z M26 15h2v1h-2z M2 16h3v1h-3z M6 16h1v1h-1z M8 16h1v1h-1z M10 16h2v1h-2z M14 16h1v1h-1z M18 16h1v1h-1z M22 16h1v1h-1z M24 16h2v1h-2z M29 16h1v1h-1z M2 17h1v1h-1z M5 17h3v1h-3z M9 17h4v1h-4z M14 17h1v1h-1z M17 17h1v1h-1z M19 17h1v1h-1z M21 17h5v1h-5z M30 17h1v1h-1z M2 18h7v1h-7z M11 18h1v1h-1z M13 18h1v1h-1z M15 18h1v1h-1z M17 18h1v1h-1z M19 18h1v1h-1z M21 18h1v1h-1z M24 18h1v1h-1z M27 18h2v1h-2z M30 18h1v1h-1z M3 19h4v1h-4z M10 19h1v1h-1z M13 19h1v1h-1z M16 19h1v1h-1z M18 19h1v1h-1z M21 19h3v1h-3z M25 19h1v1h-1z M27 19h1v1h-1z M29 19h1v1h-1z M2 20h2v1h-2z M5 20h4v1h-4z M10 20h1v1h-1z M12 20h1v1h-1z M17 20h2v1h-2z M22 20h1v1h-1z M24 20h2v1h-2z M29 20h1v1h-1z M9 21h1v1h-1z M11 21h4v1h-4z M17 21h2v1h-2z M21 21h2v1h-2z M24 21h2v1h-2z M30 21h1v1h-1z M2 22h4v1h-4z M7 22h2v1h-2z M12 22h1v1h-1z M14 22h2v1h-2z M17 22h1v1h-1z M19 22h1v1h-1z M21 22h6v1h-6z M29 22h2v1h-2z M10 23h5v1h-5z M16 23h1v1h-1z M18 23h1v1h-1z M20 23h3v1h-3z M26 23h1v1h-1z M2 24h7v1h-7z M10 24h1v1h-1z M12 24h1v1h-1z M14 24h1v1h-1z M18 24h1v1h-1z M22 24h1v1h-1z M24 24h1v1h-1z M26 24h1v1h-1z M30 24h1v1h-1z M2 25h1v1h-1z M8 25h1v1h-1z M11 25h3v1h-3z M15 25h1v1h-1z M17 25h2v1h-2z M22 25h1v1h-1z M26 25h1v1h-1z M28 25h1v1h-1z M30 25h1v1h-1z M2 26h1v1h-1z M4 26h3v1h-3z M8 26h1v1h-1z M11 26h1v1h-1z M17 26h1v1h-1z M20 26h8v1h-8z M29 26h1v1h-1z M2 27h1v1h-1z M4 27h3v1h-3z M8 27h1v1h-1z M12 27h2v1h-2z M17 27h2v1h-2z M22 27h1v1h-1z M25 27h2v1h-2z M29 27h1v1h-1z M2 28h1v1h-1z M4 28h3v1h-3z M8 28h1v1h-1z M10 28h1v1h-1z M12 28h1v1h-1z M15 28h2v1h-2z M18 28h1v1h-1z M22 28h2v1h-2z M27 28h1v1h-1z M29 28h2v1h-2z M2 29h1v1h-1z M8 29h1v1h-1z M11 29h1v1h-1z M13 29h1v1h-1z M17 29h3v1h-3z M22 29h1v1h-1z M26 29h5v1h-5z M2 30h7v1h-7z M10 30h1v1h-1z M14 30h4v1h-4z M19 30h2v1h-2z M23 30h1v1h-1z M25 30h2v1h-2z M30 30h1v1h-1z"/>
+        </svg>
+        <span class="scanline" aria-hidden="true"></span>
+      </div>
+      <figcaption>Apunta el visor aquí.</figcaption>
+    </figure>
+  </section>
+
+  <section class="section" id="que-hace" aria-labelledby="que-hace-titulo">
+    <div class="wrap">
+      <div class="section-head">
+        <h2 id="que-hace-titulo">Qué hace</h2>
+        </div>
+      <ol class="steps">
+        <li class="step">
+          <h3>Captura la pantalla</h3>
+          <p>MediaProjection lee el display.</p>
+        </li>
+        <li class="step">
+          <h3>Busca dos veces</h3>
+          <p>Primero el marco; después la pantalla.</p>
+        </li>
+        <li class="step">
+          <h3>Devuelve el contenido</h3>
+          <p>Copiar, abrir o compartir.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="section" id="instalar" aria-labelledby="instalar-titulo">
+    <div class="wrap install">
+      <div>
+        <h2 id="instalar-titulo">Instalar</h2>
+        <p class="install-note">Firmado por el proyecto.</p>
+        <a class="btn btn-primary install-cta" href="dist/QR-Screen-1.0.1.apk" download>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 4v11"/>
+            <path d="m7.5 10.5 4.5 4.5 4.5-4.5"/>
+            <path d="M5 19h14"/>
+          </svg>
+          Descargar 1.0.1
+        </a>
+      </div>
+
+      <ol class="ordered">
+        <li>Descarga el APK y ábrelo.</li>
+        <li>Permite esa fuente.</li>
+        <li><strong>Si Play Protect avisa, toca Instalar de todas formas.</strong> Es el aviso para todo lo que llega fuera de Play Store.</li>
+        <li>Concede los permisos.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="ficha-titulo">
+    <div class="wrap spec">
+      <div>
+        <h2 id="ficha-titulo">Ficha del APK</h2>
+        <p class="privacy">Sin internet ni analítica.</p>
+      </div>
+      <dl class="facts">
+        <div><dt>Versión</dt><dd>1.0.1 <span class="mono">(versionCode 2)</span></dd></div>
+        <div><dt>Tamaño</dt><dd>300 KB</dd></div>
+        <div><dt>Android</dt><dd>7.0 o superior</dd></div>
+        <div><dt>Permisos</dt><dd>superposición, notificaciones, captura y vibración</dd></div>
+        <div><dt>Internet</dt><dd>ninguno</dd></div>
+        <div><dt>Decodificador</dt><dd>ZXing 3.5.3</dd></div>
+        <div><dt>Firma SHA-256</dt><dd class="mono">e2e86041f3a5922853373b332ff96a1d3d56d2229a6c0dafda428b2c1326cc41</dd></div>
+        <div><dt>Licencia</dt><dd>MIT</dd></div>
+      </dl>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="wrap footer-inner">
+    <p class="footer-line">QR Screen, 2026.</p>
+    <p class="footer-line"><a href="https://github.com/profilebiome/qr-screen">Código en GitHub</a> <span class="sep">/</span> <a href="https://github.com/profilebiome/qr-screen#instalar">Guía de instalación</a></p>
+  </div>
+</footer>
+</body>
+</html>

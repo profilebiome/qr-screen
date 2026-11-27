@@ -8,3 +8,14 @@ local.properties
 captures/
 .externalNativeBuild/
 *.hprof
+
+# clave de firma: nunca se publica
+keystore/
+keystore.properties
+*.jks
+*.keystore
+
+# artefactos de diseño y generación locales
+.hallmark/
+.qrgen/
+.thinkrail/

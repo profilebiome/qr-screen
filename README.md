@@ -3,6 +3,20 @@
 App Android que lee códigos QR **directamente de la pantalla del celular**. No usa la cámara:
 captura la pantalla con `MediaProjection` y decodifica los píxeles con ZXing.
 
+**Descargar:** [APK firmado 1.0.1](dist/QR-Screen-1.0.1.apk) · **Página web:** <https://profilebiome.github.io/qr-screen/>
+
+![Icono de QR Screen](web/icon.png)
+
+## Cómo funciona
+
+1. El botón **Escanear pantalla** pide la captura del sistema y arranca un servicio en primer plano.
+2. Un `VirtualDisplay` entrega los fotogramas a un `ImageReader`; se recorta el área del visor y,
+   si no hay lectura, se prueban la pantalla completa reducida y a resolución nativa.
+3. ZXing decodifica el QR (con búsqueda agresiva, binarizador global e intento invertido para modo
+   oscuro). Al encontrar un código, vibra, suena y muestra la tarjeta de resultado.
+4. El texto queda en el historial local; nada sale del teléfono porque el APK no tiene permiso de
+   internet.
+
 ## Qué hace
 
 - **Escaneo en vivo**: botón «Escanear pantalla» → permiso de captura → aparece un visor flotante
@@ -83,6 +97,10 @@ El código fuente completo está en este repositorio para que cualquiera lo revi
 
 Requisitos: JDK 17 y Android SDK con platform 34 y build-tools 34.0.0.
 
+La firma se lee de `keystore.properties` (ignorado por git, junto con `keystore/`). Ese archivo no
+se publica: el repositorio solo incluye el APK ya firmado. Sin él, `assembleRelease` genera un APK
+sin firma y `assembleDebug` sigue funcionando.
+
 ```bash
 # local.properties con sdk.dir apuntando al SDK
 ./gradlew :app:assembleRelease
@@ -96,8 +114,18 @@ apksigner verify -v --print-certs dist/QR-Screen-1.0.1.apk
 aapt2 dump badging dist/QR-Screen-1.0.1.apk | findstr permission
 ```
 
-Firma: `keystore/qrscreen.jks` (alias `qrscreen`, contraseñas en `app/build.gradle`).
-Es un keystore propio para poder instalar actualizaciones encima sin desinstalar.
+Firma: keystore propio (RSA 2048, esquemas v2 y v3) para poder instalar actualizaciones encima
+sin desinstalar. La clave no forma parte del repositorio público.
+
+## Web
+
+La página de descarga está en `index.html` y se publica con GitHub Pages desde la raíz del repo.
+Incluye el botón de descarga del APK, qué hace la app, los pasos de instalación y la ficha técnica.
+Copia local: abre `index.html` con doble clic (el APK se sirve desde `dist/`).
+
+## Licencia
+
+MIT. Consulta [LICENSE](LICENSE).
 
 ## Estructura
 
