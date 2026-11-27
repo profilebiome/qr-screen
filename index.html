@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>QR Screen: escanea y crea códigos QR en Android, sin cámara</title>
-<meta name="description" content="QR Screen lee el QR que ya está en el teléfono y también crea los tuyos: captura la pantalla con MediaProjection y decodifica con ZXing. Galería de códigos con nombre y enlace. Sin cámara, sin internet, sin cuenta.">
+<meta name="description" content="QR Screen lee el QR que ya está en el teléfono y también crea los tuyos: captura la pantalla con MediaProjection y decodifica con ZXing. Galería de códigos con nombre y enlace. Sin cámara ni cuenta; internet solo para actualizar.">
 <meta name="theme-color" content="#060706">
 <meta property="og:type" content="website">
 <meta property="og:title" content="QR Screen: escáner y generador de QR sin cámara">
-<meta property="og:description" content="Escanea el QR que ya está en pantalla y crea los tuyos con nombre y enlace. Captura de pantalla, ZXing y galería local. APK de 304 KB, sin permiso de internet.">
+<meta property="og:description" content="Escanea el QR que ya está en pantalla y crea los tuyos con nombre y enlace. Captura de pantalla, ZXing, galería local y actualizaciones desde GitHub. APK de 311 KB.">
 <meta property="og:image" content="web/icon-256.png">
 <link rel="icon" href="web/favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="web/icon-256.png">
@@ -21,11 +21,13 @@
 /* Hallmark · waive 8 · 1.1.0, 304 KB y cinco permisos · cada cifra sale de la ficha del APK compilado, ninguna es estimacion */
 /* Hallmark · reworded "El QR ya está en tu pantalla" a "El QR está en tu pantalla" · el titular entra en el presupuesto de palabras del gate 58 */
 /* Hallmark · reworded "Devuelve el contenido" a "Devuelve el texto" · la tarjeta devuelve texto y así lo llama el resto de la página */
-/* Hallmark · reworded "dist/QR-Screen-1.0.1.apk" a "dist/QR-Screen-1.1.0.apk" · el APK publicado pasa a la versión con generador de códigos */
+/* Hallmark · reworded "dist/QR-Screen-1.0.1.apk" a "dist/QR-Screen-1.2.0.apk" · el APK publicado pasa a la versión con generador de códigos */
 /* Hallmark · dropped Ficha del APK · el usuario pidió quitar la ficha técnica y el pie de la página */
 /* Hallmark · dropped https://github.com/profilebiome/qr-screen#instalar · el pie se retiró a petición y la guía sigue enlazada desde Instalar */
 /* Hallmark · dropped 2026 · el pie con el año se retiró a petición del usuario */
 /* Hallmark · dropped ficha-titulo · la sección de ficha técnica se retiró a petición del usuario */
+/* Hallmark · dropped #que-hace · el usuario pidió quitar la navegación superior */
+/* Hallmark · dropped https://github.com/profilebiome/qr-screen · el usuario pidió quitar la navegación superior */
 
 :root {
   --bg: #060706;
@@ -126,21 +128,6 @@ a { color: inherit; }
   padding: 0.1rem 0.35rem;
 }
 
-.nav {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  margin-left: auto;
-}
-
-.nav a {
-  color: var(--muted);
-  text-decoration: none;
-  font-size: 0.93rem;
-}
-.nav a:hover { color: var(--text); }
-.nav a:active { color: var(--mint); }
-
 /* ------------------------------------------------------------------ buttons */
 
 .btn {
@@ -173,14 +160,6 @@ a { color: inherit; }
   box-shadow: 4px 4px 0 var(--surface-soft);
 }
 .btn-quiet:hover { border-color: var(--mint); box-shadow: 5px 5px 0 var(--surface); }
-
-.nav a.btn {
-  color: var(--mint-ink);
-  height: 2.6rem;
-  font-size: 0.88rem;
-  box-shadow: 3px 3px 0 var(--surface);
-}
-.nav a.btn:hover { color: var(--mint-ink); box-shadow: 4px 4px 0 var(--mint-deep); }
 
 .btn svg { width: 1rem; height: 1rem; display: block; }
 
@@ -443,7 +422,6 @@ button:focus-visible {
 }
 
 @media (max-width: 560px) {
-  .nav a:not(.btn) { display: none; }
   .head-inner { gap: 0.6rem; }
   .hero { padding-block: 1.5rem 2.25rem; }
   .actions .btn { width: 100%; }
@@ -468,13 +446,7 @@ button:focus-visible {
 
 <header class="site-head">
   <div class="wrap head-inner">
-    <a class="wordmark" href="./">QR Screen <span class="edition">1.1.0</span></a>
-    <nav class="nav" aria-label="Principal">
-      <a href="#que-hace">Qué hace</a>
-      <a href="#instalar">Instalar</a>
-      <a href="https://github.com/profilebiome/qr-screen">GitHub</a>
-      <a class="btn" href="dist/QR-Screen-1.1.0.apk" download>Descargar APK</a>
-    </nav>
+    <a class="wordmark" href="./">QR Screen <span class="edition">1.2.0</span></a>
   </div>
 </header>
 
@@ -502,7 +474,7 @@ button:focus-visible {
 
     <div class="hero-foot">
       <div class="actions">
-        <a class="btn" href="dist/QR-Screen-1.1.0.apk" download>
+        <a class="btn" href="dist/QR-Screen-1.2.0.apk" download>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M12 4v11"/>
             <path d="m7.5 10.5 4.5 4.5 4.5-4.5"/>
@@ -514,8 +486,8 @@ button:focus-visible {
       </div>
       <ul class="meta">
         <li>Android 7.0+</li>
-        <li>304 KB</li>
-        <li>Sin internet</li>
+        <li>311 KB</li>
+        <li>Internet para actualizar</li>
       </ul>
     </div>
   </section>
@@ -531,7 +503,7 @@ button:focus-visible {
         <li class="feature">
           <span class="num">01</span>
           <h3>Captura la pantalla</h3>
-          <p>MediaProjection lee el display, sin cámara.</p>
+          <p>MediaProjection lee el display.</p>
         </li>
         <li class="feature">
           <span class="num">02</span>
@@ -548,6 +520,11 @@ button:focus-visible {
           <h3>Crea los tuyos</h3>
           <p>Nombre, enlace y un PNG listo para compartir.</p>
         </li>
+        <li class="feature">
+          <span class="num">05</span>
+          <h3>Se actualiza sola</h3>
+          <p>Avisa y la instala desde GitHub.</p>
+        </li>
       </ol>
     </div>
   </section>
@@ -556,13 +533,13 @@ button:focus-visible {
     <div class="wrap install">
       <div>
         <h2 id="instalar-titulo">Instalar</h2>
-                <a class="btn install-cta" href="dist/QR-Screen-1.1.0.apk" download>
+                <a class="btn install-cta" href="dist/QR-Screen-1.2.0.apk" download>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M12 4v11"/>
             <path d="m7.5 10.5 4.5 4.5 4.5-4.5"/>
             <path d="M5 19h14"/>
           </svg>
-          Descargar 1.1.0
+          Descargar 1.2.0
         </a>
       </div>
       <div>

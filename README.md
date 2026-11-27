@@ -3,7 +3,7 @@
 App Android que lee códigos QR **directamente de la pantalla del celular**. No usa la cámara:
 captura la pantalla con `MediaProjection` y decodifica los píxeles con ZXing.
 
-**Descargar:** [APK firmado 1.1.0](dist/QR-Screen-1.1.0.apk) · **Página web:** <https://profilebiome.github.io/qr-screen/>
+**Descargar:** [APK firmado 1.2.0](dist/QR-Screen-1.2.0.apk) · **Página web:** <https://profilebiome.github.io/qr-screen/>
 
 ![Icono de QR Screen](web/icon.png)
 
@@ -21,6 +21,33 @@ La pantalla principal tiene dos accesos nuevos: **Crear QR** y **Mis códigos**.
 Los QR se regeneran desde el texto guardado, así que no ocupan espacio como imágenes y siempre
 están nítidos al compartirlos.
 
+## Actualizaciones
+
+La app comprueba `https://profilebiome.github.io/qr-screen/version.json` al abrirse (como mucho una
+vez cada 6 horas) y también desde **Buscar actualizaciones**, en el pie de la pantalla principal.
+Si el `versionCode` publicado es mayor, muestra el aviso **«Actualización disponible»**, descarga el
+APK, verifica su SHA-256 y abre el instalador de Android. La confirmación final la pide el sistema.
+
+Para publicar una versión nueva:
+
+1. Sube `versionCode` y `versionName` en `app/build.gradle`.
+2. `gradlew.bat :app:assembleRelease` y copia el APK a `dist/`.
+3. Calcula el SHA-256 del APK y actualiza `version.json` (`versionCode`, `versionName`, `apk`,
+   `sha256`, `notes`).
+4. Haz commit y push: Pages sirve el `version.json` nuevo en un minuto.
+
+Las versiones anteriores a la 1.2.0 no tienen el actualizador; hay que instalar la 1.2.0 a mano una
+vez.
+
+## App para PC (Windows)
+
+`pc/QR-Screen-Updater.exe` es un actualizador de escritorio: detecta el teléfono por USB con ADB,
+lee la versión instalada, consulta la publicada en GitHub y la instala con `adb install -r` sin pasar
+por el gestor de archivos. Requiere Windows 10/11, .NET Framework 4.8 (viene de serie) y las
+Platform-Tools de Android (`adb.exe`; el programa lo busca o permite elegirlo con **Buscar adb…**).
+
+Descarga: <https://github.com/profilebiome/qr-screen/raw/main/pc/QR-Screen-Updater.exe>
+
 ## Cómo funciona
 
 1. El botón **Escanear pantalla** pide la captura del sistema y arranca un servicio en primer plano.
@@ -28,8 +55,8 @@ están nítidos al compartirlos.
    si no hay lectura, se prueban la pantalla completa reducida y a resolución nativa.
 3. ZXing decodifica el QR (con búsqueda agresiva, binarizador global e intento invertido para modo
    oscuro). Al encontrar un código, vibra, suena y muestra la tarjeta de resultado.
-4. El texto queda en el historial local; nada sale del teléfono porque el APK no tiene permiso de
-   internet.
+4. El texto queda en el historial local. La única conexión a internet es la comprobación de
+   actualizaciones contra GitHub Pages.
 
 ## Qué hace
 
@@ -50,7 +77,7 @@ están nítidos al compartirlos.
 
 ## Instalar
 
-1. Copia `dist/QR-Screen-1.1.0.apk` al teléfono (cable, Drive, Telegram…).
+1. Copia `dist/QR-Screen-1.2.0.apk` al teléfono (cable, Drive, Telegram…).
 2. Ábrelo y acepta «Instalar apps desconocidas» para el explorador/gestor de archivos.
 3. Al abrir la app:
    - concede **Mostrar sobre otras apps** (visor y tarjeta de resultados),
@@ -58,7 +85,7 @@ están nítidos al compartirlos.
    - al pulsar «Escanear pantalla», acepta la **captura de pantalla** del sistema.
 
 > La aceptación de captura se pide cada vez que inicias el escáner: es un requisito de Android.
-> La app nunca pide cámara ni acceso a internet.
+> La app nunca pide cámara. Internet se usa solo para buscar e instalar actualizaciones.
 
 ### «No se puede verificar la app» / «Play Protect»
 
@@ -77,17 +104,18 @@ publicar en Play Store. Para instalar igualmente:
 ### Instalar por USB (sin avisos del gestor de archivos)
 
 Con depuración USB activada, ejecuta `instalar-adb.bat` en Windows (o a mano:
-`adb install -r dist/QR-Screen-1.1.0.apk`). Es la vía más limpia y permite ver el motivo exacto si
+`adb install -r dist/QR-Screen-1.2.0.apk`). Es la vía más limpia y permite ver el motivo exacto si
 la instalación falla.
 
 ### ¿Es maliciosa?
 
 No. Auditoría del APK:
 
-- **Sin permiso de INTERNET**: no puede enviar nada a ningún servidor.
+- **INTERNET solo para actualizaciones**: comprueba `version.json` en GitHub Pages y descarga el
+  APK. No hay analítica, ni cuentas, ni subida de datos.
 - **Sin cámara, sin contactos, sin ubicación, sin almacenamiento.**
 - Permisos: servicio en primer plano, proyección de pantalla, notificaciones, dibujar sobre otras
-  apps y vibración. Todos son los que necesita el escáner para funcionar.
+  apps, vibración, internet y pedir la instalación de paquetes (para actualizarse).
 - Una sola dependencia (ZXing core, decodificador libre de Google), sin analítica ni SDK de
   terceros; un único `classes.dex`, sin librerías nativas.
 - Firma propia (`keystore/qrscreen.jks`), verificada con `apksigner` (v1+v2+v3).
@@ -128,14 +156,13 @@ sin firma y `assembleDebug` sigue funcionando.
 Comprobar la firma y los permisos:
 
 ```bash
-apksigner verify -v --print-certs dist/QR-Screen-1.1.0.apk
-aapt2 dump badging dist/QR-Screen-1.1.0.apk | findstr permission
+apksigner verify -v --print-certs dist/QR-Screen-1.2.0.apk
+aapt2 dump badging dist/QR-Screen-1.2.0.apk | findstr permission
 ```
 
 Firma: keystore propio (RSA 2048, esquemas v2 y v3). La clave no forma parte del repositorio
-público. La 1.1.0 se firmó con una clave nueva, así que si tenías instalada la 1.0.1 hay que
-desinstalarla antes de instalar esta versión; a partir de aquí las actualizaciones se instalan
-encima sin desinstalar.
+público. La 1.1.0 se firmó con una clave nueva, así que si venías de la 1.0.1 hay que desinstalarla
+una vez; desde la 1.1.0 las actualizaciones se instalan encima.
 
 ## Web
 
@@ -158,8 +185,17 @@ app/src/main/java/com/drako/qrscreen/
   ScanOverlay.java         píldora, mira, modo ajuste y tarjeta de resultado
   QrImage.java             decodificar desde galería/imagen compartida
   HistoryStore.java        historial en SharedPreferences
+  QrStore.java             códigos creados, con nombre, tipo y fecha
+  QrRenderer.java          QR a Bitmap con ZXing
+  CreateQrActivity.java    formulario con vista previa en vivo
+  GalleryActivity.java     galería de códigos y detalle con acciones
+  QrFileProvider.java      comparte PNG y APK de actualización sin permisos de almacenamiento
+  UpdateChecker.java       version.json, descarga y SHA-256 (Java puro)
+  Updater.java             aviso de actualización, descarga e instalador
   Actions.java             copiar/abrir/compartir/vibrar
   Ui.java / HeroArtView.java  estilos y dibujo de la ilustración
+pc/QR-Screen-Updater.cs    actualizador de escritorio (C#, WinForms)
+version.json               versión publicada que leen la app y el PC
 ```
 
 ## Límites conocidos

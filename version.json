@@ -1,0 +1,8 @@
+{
+  "versionCode": 4,
+  "versionName": "1.2.0",
+  "apk": "https://profilebiome.github.io/qr-screen/dist/QR-Screen-1.2.0.apk",
+  "sha256": "826b7414e8d878b7153acc37b92e393da7003a29c54eab508a37b312c707e65c",
+  "notes": "Actualizaciones automáticas desde GitHub. Se mantiene el generador de QR con galería.",
+  "minSdk": 24
+}

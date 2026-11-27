@@ -77,6 +77,7 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
         refresh();
+        Updater.maybeCheck(this);
     }
 
     @Override
@@ -496,11 +497,17 @@ public class MainActivity extends Activity {
     }
 
     private void addFooter() {
-        TextView footer = Ui.text(this, "v1.1.0 · Sin cámara · Sin internet · Todo se queda en tu teléfono", 10.5f, 0xFF66758B);
+        TextView footer = Ui.text(this, "v1.2.0 · Sin cámara · Internet solo para actualizar", 10.5f, 0xFF66758B);
         footer.setGravity(Gravity.CENTER);
         LinearLayout.LayoutParams lp = Ui.matchWrap();
         lp.topMargin = Ui.px(this, 26);
         column.addView(footer, lp);
+
+        TextView check = Ui.bold(this, "Buscar actualizaciones", 11f, Ui.ACCENT);
+        check.setGravity(Gravity.CENTER);
+        check.setPadding(0, Ui.px(this, 10), 0, Ui.px(this, 4));
+        check.setOnClickListener(v -> Updater.check(this, true));
+        column.addView(check, Ui.matchWrap());
     }
 
     // ------------------------------------------------------------------ escaneo

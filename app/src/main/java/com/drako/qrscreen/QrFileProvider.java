@@ -35,12 +35,14 @@ public class QrFileProvider extends ContentProvider {
         if (name == null || name.contains("/") || name.contains("..")) {
             return null;
         }
-        File dir = new File(getContext().getCacheDir(), "qr-share");
-        File file = new File(dir, name);
-        if (!file.isFile()) {
-            return null;
+        File ctxCache = getContext().getCacheDir();
+        for (String folder : new String[]{"qr-share", "update"}) {
+            File file = new File(new File(ctxCache, folder), name);
+            if (file.isFile()) {
+                return file;
+            }
         }
-        return file;
+        return null;
     }
 
     @Override

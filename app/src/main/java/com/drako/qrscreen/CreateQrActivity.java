@@ -160,7 +160,7 @@ public class CreateQrActivity extends Activity {
         copyLp.topMargin = Ui.px(this, 8);
         col.addView(copyButton, copyLp);
 
-        TextView privacy = Ui.text(this, "Se guarda solo en este teléfono. Sin internet ni cuenta.",
+        TextView privacy = Ui.text(this, "Se guarda solo en este teléfono. Sin cuenta.",
                 10.5f, Ui.TEXT_DIM);
         privacy.setGravity(Gravity.CENTER);
         LinearLayout.LayoutParams privacyLp = Ui.matchWrap();
